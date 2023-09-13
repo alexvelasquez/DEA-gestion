@@ -1,12 +1,14 @@
 <template>
-<div>
-<v-btn>
-  Button
-</v-btn>
-</div>
+  <div>
+    <v-btn @click="sumar()"> Button {{ count }}</v-btn>
+  </div>
 </template>
-<script>
-export default {
-  name: "Home",
+
+<script setup>
+import { ref } from "vue";
+const count = ref(0);
+
+const sumar = () => {
+  count.value++;
 };
 </script>
