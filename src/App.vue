@@ -1,22 +1,50 @@
 <template>
   <v-layout class="rounded rounded-md">
-    <v-app-bar title="Titulo"></v-app-bar>
+    <v-navigation-drawer
+      class="bg-tertiary"
+      permanent
+      location="left"
+      v-if="$route.name != 'home'"
+    >
+      <template v-slot:prepend>
+        <v-list-item
+          lines="two"
+          prepend-avatar="/images/avatars/men-user.svg"
+          title="Jane Smith"
+          subtitle="ROL: REPRESENTANTE"
+        ></v-list-item>
+      </template>
 
-    <v-navigation-drawer>
-      <v-list>
-        <v-list-item title="Menú de opciones"></v-list-item>
+      <v-divider></v-divider>
+
+      <v-list density="compact" nav class="pa-4">
+        <v-list-item
+          prepend-icon="mdi-home-city"
+          title="Mis Espacios"
+          value="representative"
+          to="/representative"
+        ></v-list-item>
+        <v-list-item
+          prepend-icon="mdi-account-group-outline"
+          title="Representar Espacio"
+          value="account"
+          to="/representative/represent"
+        ></v-list-item>
       </v-list>
     </v-navigation-drawer>
 
     <v-main
-      class="d-flex align-center justify-center bg-tertiary"
-      style="min-height: 300px"
+      class="d-flex align-center justify-center"
+      style="min-height: 100vh"
     >
-      <router-view></router-view>
+      <v-container>
+        <v-system-bar>
+          <v-icon icon="mdi-bell-badge" class="ms-2"></v-icon>
+
+          <span class="ms-2">3:13PM</span>
+        </v-system-bar>
+        <router-view></router-view>
+      </v-container>
     </v-main>
   </v-layout>
 </template>
-<script>
-export default {
-};
-</script>
