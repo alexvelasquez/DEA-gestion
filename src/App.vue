@@ -4,7 +4,7 @@
       class="bg-tertiary"
       permanent
       location="left"
-      v-if="$route.name != 'home'"
+      v-if="$route.meta.auth"
     >
       <template v-slot:prepend>
         <v-list-item
@@ -37,7 +37,7 @@
       class="d-flex align-center justify-center"
       style="min-height: 100vh"
     >
-      <v-container>
+      <v-container v-if="$route.meta.auth">
         <v-system-bar>
           <v-icon icon="mdi-bell-badge" class="ms-2"></v-icon>
 
@@ -45,6 +45,7 @@
         </v-system-bar>
         <router-view></router-view>
       </v-container>
+      <router-view v-else></router-view>
     </v-main>
   </v-layout>
 </template>
