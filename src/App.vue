@@ -37,7 +37,7 @@
       class="d-flex align-center justify-center"
       style="min-height: 100vh"
     >
-      <v-container v-if="$route.meta.auth">
+      <v-container  v-if="$route.meta.auth">
         <v-system-bar>
           <v-icon icon="mdi-bell-badge" class="ms-2"></v-icon>
 
