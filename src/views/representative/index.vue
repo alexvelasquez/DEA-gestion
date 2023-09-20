@@ -3,7 +3,7 @@
     <v-col cols="4" v-for="space in 6" :key="space">
       <v-card>
         <v-img
-          src="/images/spaces/textura-3.jpg"
+          src="/images/spaces/textura-1.jpg"
           class="align-end"
           gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
           height="200px"
@@ -26,7 +26,7 @@
             prepend-icon="mdi-archive-remove"
             density="comfortable"
             variant="tonal"
-            >desasignar</v-btn
+            >quitar</v-btn
           >
         </v-card-actions>
       </v-card>
