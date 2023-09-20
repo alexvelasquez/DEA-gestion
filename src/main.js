@@ -2,8 +2,9 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import { router } from './router'
 import { vuetify } from './plugins/vuetify'
-
-createApp(App)
+import Axios from './plugins/axios'
+const app = createApp(App)
     .use(router)
     .use(vuetify)
-    .mount('#app')
+app.config.globalProperties.$http = Axios
+app.mount('#app')

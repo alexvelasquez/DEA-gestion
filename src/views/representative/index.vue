@@ -3,7 +3,7 @@
     <v-col cols="4" v-for="space in 6" :key="space">
       <v-card>
         <v-img
-          src="/images/spaces/textura-1.jpg"
+          src="/images/spaces/textura-3.jpg"
           class="align-end"
           gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
           height="200px"
@@ -13,6 +13,7 @@
         </v-img>
 
         <v-card-actions>
+          <v-spacer></v-spacer>
           <v-btn
             color="primary"
             prepend-icon="mdi-store-cog-outline"
@@ -21,15 +22,16 @@
             >Gestionar</v-btn
           >
           <v-spacer></v-spacer>
-          <v-btn
-            color="error"
-            prepend-icon="mdi-archive-remove"
-            density="comfortable"
-            variant="tonal"
-            >quitar</v-btn
-          >
         </v-card-actions>
       </v-card>
     </v-col>
   </v-row>
 </template>
+<script>
+export default {
+  async mounted() {
+    const {data:response} = await this.$http("/todos/1");
+    console.log(response);
+  },
+};
+</script>
