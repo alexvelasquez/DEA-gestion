@@ -15,8 +15,9 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
+          to="/redirect/1"
             color="primary"
-            prepend-icon="mdi-store-cog-outline"
+            prepend-icon="mdi-store-outline"
             density="comfortable"
             variant="tonal"
             >Gestionar</v-btn
