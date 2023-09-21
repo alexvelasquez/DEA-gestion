@@ -1,5 +1,5 @@
 import Home from "../views/Home.vue";
-
+import Redirect from '../views/Redirect.vue'
 /** AUTH */
 import Auth from "../views/auth/index.vue";
 
@@ -23,6 +23,19 @@ const routes = [
       auth: false,
     },
   },
+
+  {
+    path: "/redirect/:space",
+    name: "redirect",
+    component: Redirect,
+    props: true,
+    meta: {
+      auth: false,
+    },
+  },
+
+
+  /** AUTH */
   {
     path: "/auth",
     name: "auth",
