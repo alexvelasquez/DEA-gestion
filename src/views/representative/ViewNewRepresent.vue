@@ -64,19 +64,30 @@
         <v-img
           src="/images/spaces/textura-1.jpg"
           width="100%"
-          class="align-end justify-center"
+          class=""
           gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
           height="150px"
           cover
         >
-          <v-card-title class="text-white text-center">{{
-            sede.name
-          }}</v-card-title>
+          <div
+            class="d-flex flex-column align-center justify-space-between"
+            style="height: 100%"
+          >
+            <span style="width: 100%; color:white" class="d-flex align-center justify-end px-4 py-2">
+              <v-icon  icon="mdi-account-group" class="mr-2"></v-icon>
+            
+              <span class="mt-1">Representates: 15</span>
+            </span>
+            <v-card-title class="text-white text-center">{{
+              sede.space.name
+            }}</v-card-title>
+          </div>
         </v-img>
 
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
+            @click="requestRepresentation()"
             color="primary"
             prepend-icon="mdi-account-group-outline"
             density="comfortable"
@@ -89,12 +100,17 @@
       <v-card v-else class="mx-auto border" max-width="450" max-height="250">
         <v-card-text class="text-center py-10">
           <v-icon style="font-size: 40px" icon="mdi-store-alert"></v-icon><br />
-          <v-btn @click="openEspacioObligado=true" variant="tonal" class="mt-4" color="primary"
+          <v-btn
+            @click="openEspacioObligado = true"
+            variant="tonal"
+            class="mt-4"
+            color="primary"
             >CREAR ESPACIO OBLIGADO</v-btn
           >
         </v-card-text>
       </v-card>
     </v-col>
+
     <!-- Modal entidad -->
     <v-dialog v-model="openEntity" width="500" persistent>
       <v-card class="pa-4">
@@ -187,6 +203,7 @@
         <p class="mt-4 d-flex justify-center">ESPACIO OBLIGADO</p>
         <v-card-text>
           <v-text-field
+            v-model="space.name"
             variant="outlined"
             density="compact"
             label="Nombre"
@@ -201,7 +218,12 @@
             text="Cerrar"
             @click="openEspacioObligado = false"
           ></v-btn>
-          <v-btn variant="tonal" color="primary" text="Guardar"></v-btn>
+          <v-btn
+            @click="saveSpace()"
+            variant="tonal"
+            color="primary"
+            text="Guardar"
+          ></v-btn>
 
           <v-spacer></v-spacer>
         </v-card-actions>
@@ -210,15 +232,20 @@
   </v-row>
 </template>
 <script>
+import alerts from "../../mixins/sweetalert";
 export default {
+  mixins: [alerts],
   data() {
     return {
       openEntity: false,
       openSede: false,
       openEspacioObligado: false,
+
       loading: false,
       entity: null,
       sede: null,
+      space: { name: null },
+
       entities: [
         { name: "UNLP", cod: "UNLP" },
         { name: "Sport Club", cod: "SPORTCLUB" },
@@ -230,62 +257,105 @@ export default {
           {
             name: "Facultad de Ciencias Médicas Av. 60 & Av. 120",
             cod: "FCMUNLP",
-            space: true,
+            space: {
+              name: "Facultad de Ciencias Médicas Av. 60 & Av. 120",
+            },
           },
           {
             name: "Facultad de Ingeniería Av.1 750",
             cod: "FINGUNLP",
-            space: true,
+            space: {
+              name: "Facultad de Ingeniería Av.1 750",
+            },
           },
           {
             name: "Facultad de Informática Calle 50 & Av.120",
             cod: "FINFUNLP",
-            space: false,
+            space: null,
           },
         ],
         SPORTCLUB: [
           {
             name: "Calle 54 e/ 7 & 8",
             cod: "C54SC",
-            space: false,
+            space: {
+              name: "Calle 54 e/ 7 & 8",
+            },
           },
           {
             name: "Calle 49 432",
             cod: "C49SC",
-            space: false,
+            space: null,
           },
           {
             name: "Av 1 1100",
             cod: "AV1SC",
-            space: true,
+            space: {
+              name: "Av 1 1100",
+            },
           },
         ],
         MAC: [
           {
             name: "Calle 47 631",
             cod: "C49MC",
-            space: true,
+            space: null,
           },
           {
             name: "Calle 50 642",
             cod: "C50MC",
-            space: true,
+            space: {
+              name: "Calle 50 642",
+            },
           },
           {
             name: "Av 7 524",
             cod: "AV7MC",
-            space: true,
+            space: {
+              name: "Av 7 524",
+            },
           },
         ],
         TC: [
           {
             name: "Sede Central Calle 46 e/ 20 & 21",
             cod: "SEDETC",
-            space: false,
+            space: null,
           },
         ],
       },
     };
+  },
+  methods: {
+    async saveSpace() {
+      try {
+        this.openEspacioObligado = false;
+        this.loading = true;
+        const response = await new Promise((resolve) =>
+          setTimeout(resolve, 1500)
+        );
+        this.sede.space = this.space;
+        this.loading = false;
+      } catch (error) {}
+    },
+    async requestRepresentation() {
+      const { isConfirmed } = await this.alertQuestion(
+        "Solicitud de representación",
+        "¿Confirmar?"
+      );
+      // console.log(isConfirmed);
+      if (isConfirmed) {
+        this.loading = true;
+        const response = await new Promise((resolve) =>
+          setTimeout(resolve, 1500)
+        );
+        this.loading = false;
+        this.alertSuccess(
+          "Solicitud enviada!",
+          "En breve se analizará para ser aprobada"
+        );
+      }
+    },
   },
   watch: {
     entity() {
@@ -298,8 +368,6 @@ export default {
           setTimeout(resolve, 1500)
         );
         this.loading = false;
-      } else {
-        this.sede = null;
       }
     },
   },
