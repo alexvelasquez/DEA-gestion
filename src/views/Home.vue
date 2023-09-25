@@ -1,26 +1,50 @@
 <template>
   <v-row class="px-4">
     <v-col cols="12" md="4" v-for="(option, i) in options" :key="i">
-      <v-card class="mx-auto" prepend-icon="mdi-account-tie" :to="option.to">
-        <template v-slot:title> {{option.name}} </template>
+      <v-card
+        class="mx-auto"
+        prepend-icon="mdi-account-tie"
+        @click="go(option)"
+      >
+        <template v-slot:title> {{ option.name }} </template>
       </v-card>
     </v-col>
   </v-row>
 </template>
 
-<script setup>
-const options = [
-  {
-    name: "REPRESENTANTE",
-    to: "/representative",
+<script>
+import { useAppStore } from "../stores/app";
+import { mapWritableState } from "pinia";
+export default {
+  data() {
+    return {
+      options: [
+        {
+          name: "REPRESENTANTE",
+          rol: "REPRESENTANTE",
+          to: "/representante",
+        },
+        {
+          name: "ADMINISTRADOR PROVINCIAL",
+          rol: "ADMIN_PROVINCIAL",
+          to: "/administrador-provincial",
+        },
+        {
+          name: "USUARIO CERTIFICANTE",
+          rol: "USER_CERTIFICANTE",
+          to: "/certify-user",
+        },
+      ],
+    };
   },
-  {
-    name: "ADMINISTRADOR PROVINCIAL",
-    to: "/provincial-administrator",
+  computed: {
+    ...mapWritableState(useAppStore, ["rol"]),
   },
-  {
-    name: "USUARIO CERTIFICANTE",
-    to: "/certify-user",
+  methods: {
+    go(option) {
+      this.rol = option.rol;
+      this.$router.push(option.to);
+    },
   },
-];
+};
 </script>

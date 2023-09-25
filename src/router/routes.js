@@ -1,36 +1,47 @@
 import Home from "../views/Home.vue";
-import Redirect from '../views/Redirect.vue'
+import Redireccion from '../views/Redireccion.vue'
+
 /** AUTH */
 import Auth from "../views/auth/index.vue";
 
-/** REPRESENTATIVE */
-import Representaive from "../views/representative/index.vue";
-import NewRepresent from "../views/representative/ViewNewRepresent.vue";
+/** REPRESENTANTE */
+import Representante from "../views/representante/index.vue";
+import MisEspaciosObligados from "../views/representante/usuario/MisEspaciosObligados.vue";
+import SolicitarRepresentacion from "../views/representante/usuario/SolicitarRepresentacion.vue";
 
-/** ADMIN PROVINCIAL */
-import ProvincialAdministrator from "../views/provincial-administrator/index.vue";
+/** REPRESENTANTE DEA */
+import EspacioObligado from "../views/representante/espacio-obligado/index.vue"
+import Deas from "../views/representante/espacio-obligado/Deas.vue";
+import EntidadSede from "../views/representante/espacio-obligado/EntidadSede.vue";
+import DeclaracionJurada from "../views/representante/espacio-obligado/DeclaracionJurada.vue";
+import MuertesSubita from "../views/representante/espacio-obligado/MuerteSubita.vue";
 
-/** USER CERTIFICATE */
-import CertifyUser from "../views/certify-user/index.vue";
+/** ADMINISTRADOR PROVINCIAL */
+import AdministradorProvincial from "../views/administrador-provincial/index.vue";
+import HomeAdministrador from "../views/administrador-provincial/Home.vue";
+
+/** USUARIO CERTIFICANTE */
+import UsuarioCertificante from "../views/usuario-certificante/index.vue";
+import HomeUsuarioCertificante from "../views/usuario-certificante/Home.vue";
 
 const routes = [
   {
     path: "/",
     name: "home",
     component: Home,
-    props: true,
     meta: {
       auth: false,
+      title: 'Home'
     },
   },
 
   {
-    path: "/redirect/:space",
+    path: "/redirect/:espacio",
     name: "redirect",
-    component: Redirect,
-    props: true,
+    component: Redireccion,
     meta: {
       auth: false,
+      title: ''
     },
   },
 
@@ -40,49 +51,120 @@ const routes = [
     path: "/auth",
     name: "auth",
     component: Auth,
-    props: true,
     meta: {
       auth: false,
     },
   },
+
+
   /** REPRESENTATIVE */
   {
-    path: "/representative",
-    name: "representative",
-    component: Representaive,
-    props: true,
-    meta: {
-      auth: true,
-    },
+    path: "/representante",
+    name: "representante",
+    component: Representante,
+    redirect: { name: 'espacios-obligados' },
+    children: [
+      {
+        path: "espacios-obligados",
+        name: "espacios-obligados",
+        component: MisEspaciosObligados,
+        meta: {
+          auth: true,
+          title: 'Mis espacios'
+        },
+      },
+      {
+        path: "solicitar-representacion",
+        name: "solicitar-representacion",
+        component: SolicitarRepresentacion,
+        meta: {
+          auth: true,
+          title: 'Solicitar representación'
+        },
+      },
+      {
+        path: "espacio-obligado/:espacio",
+        name: "representante",
+        component: EspacioObligado,
+        redirect: { name: 'entidad-sede' },
+        children: [
+          {
+            path: "entidad-sede",
+            name: "entidad-sede",
+            component: EntidadSede,
+            meta: {
+              auth: true,
+              title: 'Entidad/Sede'
+            },
+          },
+          {
+            path: "deas",
+            name: "deas",
+            component: Deas,
+            meta: {
+              auth: true,
+              title: 'DEAS'
+            },
+          },
+          {
+            path: "decaracion-jurada",
+            name: "ddjj",
+            component: DeclaracionJurada,
+            meta: {
+              auth: true,
+              title: 'Declaración Jurada'
+            },
+          },
+          {
+            path: "muertes-subita",
+            name: "muertes-subita",
+            component: MuertesSubita,
+            meta: {
+              auth: true,
+              title: 'Muertes súbitas'
+            },
+          },
+        ]
+      }
+
+    ]
   },
-  {
-    path: "/representative/represent",
-    name: "represent",
-    component: NewRepresent,
-    props: true,
-    meta: {
-      auth: true,
-    },
-  },
+
+
+
   /** CERTIFICANTE */
   {
-    path: "/certify-user",
-    name: "certify-user",
-    component: CertifyUser,
-    props: true,
-    meta: {
-      auth: true,
-    },
+    path: "/usuario-certificante",
+    name: "usuario-certificante",
+    component: UsuarioCertificante,
+    redirect: { name: 'home-usuario-certificante' },
+    children: [
+      {
+        path: "",
+        name: "home-usuario-certificante",
+        component: HomeUsuarioCertificante,
+        meta: {
+          auth: true,
+        },
+      },
+    ]
   },
   /** PROVINCIAL */
   {
-    path: "/provincial-administrator",
-    name: "provincial-administrator",
-    component: ProvincialAdministrator,
-    props: true,
-    meta: {
-      auth: true,
-    },
+    path: "/administrador-provincial",
+    name: "administrador-provincial",
+    component: AdministradorProvincial,
+    redirect: { name: 'home-administrador' },
+    children: [
+      {
+        path: "",
+        name: "home-administrador",
+        component: HomeAdministrador,
+        meta: {
+          auth: true,
+        },
+      },
+    ]
   },
 ];
 
