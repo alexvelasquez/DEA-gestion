@@ -25,7 +25,7 @@
         </v-col>
       </v-row>
       <v-expansion-panels v-model="panels" multiple>
-        <v-expansion-panel v-for="i in 3" :key="i" class="mt-4">
+        <v-expansion-panel v-for="i in 3" :key="i" class="">
           <v-expansion-panel-title class="py-6 bg-tertiary" disable-icon-rotate>
             DEA N° {{ i }}
             <template v-slot:actions>
