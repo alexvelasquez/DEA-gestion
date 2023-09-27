@@ -35,6 +35,7 @@
 
         <v-card-actions>
           <v-btn
+          :disabled="space.estado == 'PROCESO'"
             to="/redirect/1"
             color="primary"
             block
