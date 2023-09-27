@@ -98,11 +98,16 @@
           <v-btn
             @click="requestRepresentation()"
             color="primary"
+            :disabled="sede.space.pending"
             block
             prepend-icon="mdi-account-group-outline"
             density="comfortable"
             variant="tonal"
-            >solicitar representación</v-btn
+            >{{
+              sede.space.pending
+                ? "Pendiente de aprobación"
+                : "Solicitar representación"
+            }}</v-btn
           >
           <v-spacer></v-spacer>
         </v-card-actions>
@@ -127,11 +132,13 @@
         <p>ENTIDAD</p>
         <v-card-text>
           <v-text-field
+            v-model="newEntity.cod"
             variant="outlined"
             density="compact"
             label="CUIT"
           ></v-text-field>
           <v-text-field
+            v-model="newEntity.name"
             variant="outlined"
             density="compact"
             label="Razón social"
@@ -141,16 +148,26 @@
         <p class="mt-4">SEDE</p>
         <v-card-text>
           <v-select
+            v-model="newSede.provincia"
+            :items="['BUENOS AIRES', 'MISIONES', 'CORRIENTES']"
             variant="outlined"
             density="compact"
             label="Provincia"
           ></v-select>
           <v-text-field
+            v-model="newSede.direccion"
+            variant="outlined"
+            density="compact"
+            label="Dirección"
+          ></v-text-field>
+          <v-text-field
+            v-model="newSede.name"
             variant="outlined"
             density="compact"
             label="Nombre"
           ></v-text-field>
           <v-text-field
+            v-model="newSede.cod"
             variant="outlined"
             density="compact"
             label="Número de sede"
@@ -165,7 +182,12 @@
             text="Cerrar"
             @click="openEntity = false"
           ></v-btn>
-          <v-btn variant="tonal" color="primary" text="Guardar"></v-btn>
+          <v-btn
+            @click="saveEntity()"
+            variant="tonal"
+            color="primary"
+            text="Guardar"
+          ></v-btn>
 
           <v-spacer></v-spacer>
         </v-card-actions>
@@ -178,15 +200,24 @@
         <v-card-text>
           <v-select
             variant="outlined"
+            v-model="newSede.provincia"
             density="compact"
             label="Provincia"
           ></v-select>
           <v-text-field
+            v-model="newSede.direccion"
+            variant="outlined"
+            density="compact"
+            label="Direccion"
+          ></v-text-field>
+          <v-text-field
+            v-model="newSede.name"
             variant="outlined"
             density="compact"
             label="Nombre"
           ></v-text-field>
           <v-text-field
+            v-model="newSede.cod"
             variant="outlined"
             density="compact"
             label="Número de sede"
@@ -201,7 +232,7 @@
             text="Cerrar"
             @click="openSede = false"
           ></v-btn>
-          <v-btn variant="tonal" color="primary" text="Guardar"></v-btn>
+          <v-btn @click="saveSede()" variant="tonal" color="primary" text="Guardar"></v-btn>
 
           <v-spacer></v-spacer>
         </v-card-actions>
@@ -256,6 +287,8 @@ export default {
       sede: null,
       space: { name: null },
 
+      newEntity: {},
+      newSede: {},
       entities: [
         { name: "UNLP", cod: "UNLP" },
         { name: "Sport Club", cod: "SPORTCLUB" },
@@ -269,6 +302,7 @@ export default {
             cod: "FCMUNLP",
             space: {
               name: "Facultad de Ciencias Médicas Av. 60 & Av. 120",
+              pending: true,
             },
           },
           {
@@ -290,6 +324,7 @@ export default {
             cod: "C54SC",
             space: {
               name: "Calle 54 e/ 7 & 8",
+              pending: true,
             },
           },
           {
@@ -348,6 +383,7 @@ export default {
         this.loading = false;
       } catch (error) {}
     },
+
     async requestRepresentation() {
       const { isConfirmed } = await this.alertQuestion(
         "Solicitud de representación",
@@ -360,11 +396,31 @@ export default {
           setTimeout(resolve, 1500)
         );
         this.loading = false;
+        this.sede.space.pending = true;
         this.alertSuccess(
           "Solicitud enviada!",
           "En breve se analizará para ser aprobada"
         );
       }
+    },
+
+    saveEntity() {
+      this.entities.push(this.newEntity);
+      this.entity = this.newEntity.cod;
+      this.sedes[this.entity] = [];
+      this.sedes[this.entity].push(this.newSede);
+      this.$nextTick(() => {
+        this.sede = this.newSede;
+      });
+      this.openEntity = false;
+    },
+
+    saveSede() {
+      this.sedes[this.entity].push(this.newSede);
+      this.$nextTick(() => {
+        this.sede = this.newSede;
+      });
+            this.openSede = false;
     },
   },
   watch: {
