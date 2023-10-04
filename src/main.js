@@ -10,7 +10,7 @@ import Axios from './plugins/axios'
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 
-
+import './assets/custom.css'
 import 'animate.css';
 
 const pinia = createPinia()
