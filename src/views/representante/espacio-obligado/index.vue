@@ -2,13 +2,13 @@
   <div>
     <div class="text-center">
       <v-snackbar
-        location="top right"
+        location="top center"
         color="primary"
         style="top: 30px"
         v-model="snackbar"
         :timeout="-1"
       >
-        REPRESENTANDO: FACULTAD DE MEDICINA
+        REPRESENTANDO: {{ espacioObligado.nombre }}
 
         <template v-slot:actions>
           <v-btn color="white" variant="text" @click="back()">
@@ -23,14 +23,13 @@
   </div>
 </template>
 <script>
-import { useAppStore } from "../../../stores/app";
-import { mapWritableState } from "pinia";
 export default {
   data() {
     return {
       snackbar: true,
       menu: [
         {
+          id: "ENTIDAD-SEDE",
           name: "ENTIDAD/SEDE",
           icon: "mdi-office-building-marker",
           to: {
@@ -38,6 +37,7 @@ export default {
           },
         },
         {
+          id: "DEAS",
           name: "DEAS",
           icon: "mdi-heart-pulse",
           to: {
@@ -45,6 +45,7 @@ export default {
           },
         },
         {
+          id: "DDJJ",
           name: "DECLARACIÓN JURADA",
           icon: "mdi-file-sign",
           to: {
@@ -52,6 +53,7 @@ export default {
           },
         },
         {
+          id: "MUERTES-SUBITAS",
           name: "MUERTES SÚBITAS",
           icon: "mdi-account-minus",
           to: {
@@ -62,10 +64,27 @@ export default {
     };
   },
   beforeMount() {
+    this.menu = this.menu.map((m) => {
+      if (!this.espacioObligado.puede_completar_ddjj_dea) {
+        if (m.id == "DDJJ") {
+          m.deshabilitado = true;
+        }
+        m.hover = "Debe registar al menos un DEA";
+      }
+      if (!this.espacioObligado.puede_cargar_dea) {
+        if (m.id == "DEAS") {
+          m.deshabilitado = true;
+        }
+        m.hover = "Debe completar los campos de la ENTIDAD/SEDE";
+      }
+      return m;
+    });
     this.menuUser = this.menu;
   },
   computed: {
-    ...mapWritableState(useAppStore, ["rol", "menuUser"]),
+    espacioObligado() {
+      return JSON.parse(localStorage.getItem("espacio-obligado"));
+    },
   },
   methods: {
     back() {
