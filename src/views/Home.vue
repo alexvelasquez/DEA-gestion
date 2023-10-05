@@ -18,6 +18,20 @@ import { mapWritableState } from "pinia";
 export default {
   data() {
     return {
+      usuario: {
+        REPRESENTANTE: {
+          email: "representante@mail.com",
+          password: "Pass1234",
+        },
+        ADMIN_PROVINCIAL: {
+          email: "provincial@mail.com",
+          password: "Pass1234",
+        },
+        USER_CERTIFICANTE: {
+          email: "certificador@mail.com",
+          password: "Pass1234",
+        },
+      },
       options: [
         {
           name: "REPRESENTANTE",
@@ -38,12 +52,22 @@ export default {
     };
   },
   computed: {
-    ...mapWritableState(useAppStore, ["rol"]),
+    ...mapWritableState(useAppStore, ["rol", "user"]),
   },
   methods: {
-    go(option) {
-      this.rol = option.rol;
-      this.$router.push(option.to);
+    async go(option) {
+      try {
+        const {
+          data: { access_token },
+        } = await this.$http.post("/login", this.usuario[option.rol]);
+        localStorage.setItem("token", access_token);
+
+        const { data: user } = await this.$http.get("/users/me");
+        this.user = user;
+        this.$router.push(option.to);
+      } catch (error) {
+        console.log(error);
+      }
     },
   },
 };
