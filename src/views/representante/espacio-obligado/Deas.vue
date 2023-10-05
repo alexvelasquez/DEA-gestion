@@ -15,12 +15,11 @@
         </v-col>
         <v-col cols="12" md="2">
           <v-btn
-            prepend-icon="mdi-hand-heart-outline"
             block
             color="primary"
             size="large"
             variant="elevated"
-            >NUEVO DEA</v-btn
+            >NUEVO</v-btn
           >
         </v-col>
       </v-row>
