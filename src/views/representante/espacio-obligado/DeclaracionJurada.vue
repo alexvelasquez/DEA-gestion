@@ -12,31 +12,20 @@
                 <v-radio label="SI" value="SI"></v-radio>
                 <v-radio label="NO" value="NO"></v-radio>
               </v-radio-group>
-              <v-radio-group label="¿Señalitica adecuada?" inline>
+              <v-radio-group label="¿Señaletica adecuada?" inline>
                 <v-radio label="SI" value="SI"></v-radio>
                 <v-radio label="NO" value="NO"></v-radio>
               </v-radio-group>
-              <v-radio-group label="¿Sistema de energia media?" inline>
+              <v-radio-group label="¿Sistema de emergencia médica?" inline>
                 <v-radio label="SI" value="SI"></v-radio>
                 <v-radio label="NO" value="NO"></v-radio>
               </v-radio-group>
-              <v-select
-                class="px-3"
-                label="Responsables"
-                variant="outlined"
-                :items="['Juan Carlos', 'Alex Velasquez', 'Mariano Cordoba']"
-                persistent-placeholder
-                multiple
-                chips
-                density="compact"
-              >
-              </v-select>
             </v-col>
             <v-col cols="6">
               <v-text-field
                 class="pl-3"
                 placeholder="1"
-                label="Protocolo de acciòn"
+                label="Protocolo de acción"
                 variant="outlined"
                 persistent-placeholder
                 density="compact"
