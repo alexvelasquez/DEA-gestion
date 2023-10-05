@@ -162,6 +162,7 @@ const routes = [
         component: HomeAdministrador,
         meta: {
           auth: true,
+          title: 'Solicitudes'
         },
       },
     ]
