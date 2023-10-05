@@ -4,8 +4,6 @@
   </div>
 </template>
 <script>
-import { useAppStore } from "../../stores/app";
-import { mapWritableState } from "pinia";
 export default {
   data() {
     return {
@@ -25,9 +23,6 @@ export default {
   },
   beforeMount() {
     this.menuUser = this.menu;
-  },
-  computed: {
-    ...mapWritableState(useAppStore, ["menuUser"]),
   },
 };
 </script>
