@@ -7,15 +7,18 @@
         variant="tonal"
       ></v-alert>
     </v-col>
+
     <v-col cols="12" md="6">
       <v-autocomplete
-        v-model="entity"
+        v-model="entidad"
         label="Entidad"
         :items="entities"
+        ref="entidad"
         placeholder="Busca una entidad, si no existe, créala"
-        item-title="name"
-        item-value="cod"
+        item-title="razon_social"
+        item-value="id"
         variant="outlined"
+        return-object
         persistent-placeholder
       >
         <template v-slot:no-data>
@@ -27,16 +30,17 @@
         </template>
       </v-autocomplete>
     </v-col>
+
     <v-col cols="12" md="6">
       <v-autocomplete
         v-model="sede"
-        :disabled="!entity"
+        :disabled="!entidad"
         label="Sede"
-        :items="entity ? sedes[entity] : []"
-        item-title="name"
-        item-value="cod"
-        return-object
+        :items="sedes"
+        item-title="nombre"
+        item-value="id"
         variant="outlined"
+        return-object
       >
         <template v-slot:no-data>
           <div class="d-flex justify-center">
@@ -45,8 +49,15 @@
             </v-btn>
           </div>
         </template>
+        <template v-slot:item="{ props, item }">
+          <v-list-item
+            v-bind="props"
+            :subtitle="`Dirección: ${item.raw.direccion}`"
+          ></v-list-item>
+        </template>
       </v-autocomplete>
     </v-col>
+
     <v-col cols="12" v-if="sede">
       <v-skeleton-loader
         v-if="loading"
@@ -56,7 +67,7 @@
         type="image, actions"
       ></v-skeleton-loader>
       <v-card
-        v-else-if="sede.space"
+        v-else-if="espacioObligado"
         class="mx-auto border"
         max-width="450"
         max-height="250"
@@ -84,11 +95,11 @@
                 prepend-icon="mdi-account-group"
                 class="mr-2"
               >
-                REPRESENTANTES: 0
+                REPRESENTANTES: {{ espacioObligado.cant_administradores }}
               </v-chip>
             </span>
             <v-card-title class="text-white text-center">{{
-              sede.space.name
+              espacioObligado.nombre
             }}</v-card-title>
           </div>
         </v-img>
@@ -96,31 +107,40 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
-            @click="requestRepresentation()"
+            v-if="!espacioObligado.solicitado"
+            @click="solicitarRepresentacion()"
             color="primary"
-            :disabled="sede.space.pending"
             block
             prepend-icon="mdi-account-group-outline"
             density="comfortable"
             variant="tonal"
-            >{{
-              sede.space.pending
-                ? "Pendiente de aprobación"
-                : "Solicitar representación"
-            }}</v-btn
           >
+            Solicitar representación
+          </v-btn>
+          <div v-else class="d-flex justify-center">
+            <p class="font-weight-semibold mr-2">Solicitud enviada</p>
+            <v-icon icon="mdi-check-circle-outline" color="success"></v-icon>
+          </div>
           <v-spacer></v-spacer>
         </v-card-actions>
       </v-card>
-      <v-card v-else class="mx-auto border" max-width="450" max-height="250">
+      <v-card
+        v-else
+        class="mx-auto border"
+        elevation="0"
+        max-width="450"
+        max-height="250"
+      >
         <v-card-text class="text-center py-10">
-          <v-icon style="font-size: 40px" icon="mdi-store-alert"></v-icon><br />
+          <v-icon style="font-size: 40px" icon="mdi-store-search"></v-icon
+          ><br />
+          <p>No existe un espacio obligado para esta sede</p>
           <v-btn
             @click="openEspacioObligado = true"
             variant="tonal"
             class="mt-4"
             color="primary"
-            >CREAR ESPACIO OBLIGADO</v-btn
+            >CREAR ESPACIO</v-btn
           >
         </v-card-text>
       </v-card>
@@ -132,45 +152,16 @@
         <p>ENTIDAD</p>
         <v-card-text>
           <v-text-field
-            v-model="newEntity.cod"
+            v-model="nuevaEntidad.cuit"
             variant="outlined"
             density="compact"
             label="CUIT"
           ></v-text-field>
           <v-text-field
-            v-model="newEntity.name"
+            v-model="nuevaEntidad.razon_social"
             variant="outlined"
             density="compact"
             label="Razón social"
-          ></v-text-field>
-        </v-card-text>
-        <v-divider></v-divider>
-        <p class="mt-4">SEDE</p>
-        <v-card-text>
-          <v-select
-            v-model="newSede.provincia"
-            :items="['BUENOS AIRES', 'MISIONES', 'CORRIENTES']"
-            variant="outlined"
-            density="compact"
-            label="Provincia"
-          ></v-select>
-          <v-text-field
-            v-model="newSede.direccion"
-            variant="outlined"
-            density="compact"
-            label="Dirección"
-          ></v-text-field>
-          <v-text-field
-            v-model="newSede.name"
-            variant="outlined"
-            density="compact"
-            label="Nombre"
-          ></v-text-field>
-          <v-text-field
-            v-model="newSede.cod"
-            variant="outlined"
-            density="compact"
-            label="Número de sede"
           ></v-text-field>
         </v-card-text>
         <v-divider></v-divider>
@@ -183,7 +174,7 @@
             @click="openEntity = false"
           ></v-btn>
           <v-btn
-            @click="saveEntity()"
+            @click="guardarEntidad()"
             variant="tonal"
             color="primary"
             text="Guardar"
@@ -198,29 +189,36 @@
       <v-card class="pa-4">
         <p class="mt-4">SEDE</p>
         <v-card-text>
-          <v-select
-            variant="outlined"
-            v-model="newSede.provincia"
-            density="compact"
-            label="Provincia"
-          ></v-select>
           <v-text-field
-            v-model="newSede.direccion"
-            variant="outlined"
-            density="compact"
-            label="Direccion"
-          ></v-text-field>
-          <v-text-field
-            v-model="newSede.name"
+            v-model="nuevaSede.nombre"
             variant="outlined"
             density="compact"
             label="Nombre"
+            persistent-placeholder
+          ></v-text-field>
+          <v-autocomplete
+            variant="outlined"
+            v-model="nuevaSede.provincia_id"
+            density="compact"
+            :items="provincias"
+            item-title="nombre"
+            item-value="id"
+            label="Provincia"
+            persistent-placeholder
+          ></v-autocomplete>
+          <v-text-field
+            v-model="nuevaSede.direccion"
+            variant="outlined"
+            density="compact"
+            label="Dirección"
+            persistent-placeholder
           ></v-text-field>
           <v-text-field
-            v-model="newSede.cod"
+            v-model="nuevaSede.numero"
             variant="outlined"
             density="compact"
             label="Número de sede"
+            persistent-placeholder
           ></v-text-field>
         </v-card-text>
         <v-divider></v-divider>
@@ -232,7 +230,12 @@
             text="Cerrar"
             @click="openSede = false"
           ></v-btn>
-          <v-btn @click="saveSede()" variant="tonal" color="primary" text="Guardar"></v-btn>
+          <v-btn
+            @click="guardarSede()"
+            variant="tonal"
+            color="primary"
+            text="Guardar"
+          ></v-btn>
 
           <v-spacer></v-spacer>
         </v-card-actions>
@@ -244,7 +247,7 @@
         <p class="mt-4 d-flex justify-center">ESPACIO OBLIGADO</p>
         <v-card-text>
           <v-text-field
-            v-model="space.name"
+            v-model="nuevoEspacioObligado.nombre"
             variant="outlined"
             density="compact"
             label="Nombre"
@@ -260,7 +263,7 @@
             @click="openEspacioObligado = false"
           ></v-btn>
           <v-btn
-            @click="saveSpace()"
+            @click="guardarEspacio()"
             variant="tonal"
             color="primary"
             text="Guardar"
@@ -283,158 +286,157 @@ export default {
       openEspacioObligado: false,
 
       loading: false,
-      entity: null,
-      sede: null,
-      space: { name: null },
 
-      newEntity: {},
-      newSede: {},
-      entities: [
-        { name: "UNLP", cod: "UNLP" },
-        { name: "Sport Club", cod: "SPORTCLUB" },
-        { name: "McDonalds", cod: "MAC" },
-        { name: "Teofilo café", cod: "TC" },
-      ],
-      sedes: {
-        UNLP: [
-          {
-            name: "Facultad de Ciencias Médicas Av. 60 & Av. 120",
-            cod: "FCMUNLP",
-            space: {
-              name: "Facultad de Ciencias Médicas Av. 60 & Av. 120",
-              pending: true,
-            },
-          },
-          {
-            name: "Facultad de Ingeniería Av.1 750",
-            cod: "FINGUNLP",
-            space: {
-              name: "Facultad de Ingeniería Av.1 750",
-            },
-          },
-          {
-            name: "Facultad de Informática Calle 50 & Av.120",
-            cod: "FINFUNLP",
-            space: null,
-          },
-        ],
-        SPORTCLUB: [
-          {
-            name: "Calle 54 e/ 7 & 8",
-            cod: "C54SC",
-            space: {
-              name: "Calle 54 e/ 7 & 8",
-              pending: true,
-            },
-          },
-          {
-            name: "Calle 49 432",
-            cod: "C49SC",
-            space: null,
-          },
-          {
-            name: "Av 1 1100",
-            cod: "AV1SC",
-            space: {
-              name: "Av 1 1100",
-            },
-          },
-        ],
-        MAC: [
-          {
-            name: "Calle 47 631",
-            cod: "C49MC",
-            space: null,
-          },
-          {
-            name: "Calle 50 642",
-            cod: "C50MC",
-            space: {
-              name: "Calle 50 642",
-            },
-          },
-          {
-            name: "Av 7 524",
-            cod: "AV7MC",
-            space: {
-              name: "Av 7 524",
-            },
-          },
-        ],
-        TC: [
-          {
-            name: "Sede Central Calle 46 e/ 20 & 21",
-            cod: "SEDETC",
-            space: null,
-          },
-        ],
-      },
+      entidad: null,
+      sede: null,
+      espacioObligado: null,
+
+      entities: [],
+      provincias: [],
+
+      nuevaEntidad: {},
+      nuevaSede: {},
+      nuevoEspacioObligado: {},
     };
   },
+  async created() {
+    const {
+      data: { data: provincias },
+    } = await this.$http.get("/provincias/");
+
+    this.provincias = provincias;
+
+    const {
+      data: { data: entidades },
+    } = await this.$http.get("/entidades/");
+    this.entities = entidades;
+  },
+
+  computed: {
+    sedes() {
+      return this.entidad ? this.entidad.sedes || [] : [];
+    },
+  },
   methods: {
-    async saveSpace() {
+    async guardarEntidad() {
+      try {
+        const {
+          data: { data: entidad },
+        } = await this.$http.post("/entidades/", this.nuevaEntidad);
+        const {
+          data: { data: entidades },
+        } = await this.$http.get("/entidades/");
+        this.entities = entidades;
+        this.entidad = entidad;
+      } catch (error) {
+      } finally {
+        this.openEntity = false;
+        this.openSede = true;
+      }
+    },
+
+    async guardarSede() {
+      try {
+        const params = {
+          ...{ entidad_id: this.entidad.id },
+          ...this.nuevaSede,
+        };
+        const {
+          data: { data: sede },
+        } = await this.$http.post("/sedes/", params);
+        const {
+          data: { data: entidades },
+        } = await this.$http.get("/entidades/");
+        this.entities = entidades;
+        this.sede = sede;
+      } catch (error) {
+      } finally {
+        this.openSede = false;
+      }
+    },
+
+    async guardarEspacio() {
       try {
         this.openEspacioObligado = false;
-        this.loading = true;
-        const response = await new Promise((resolve) =>
-          setTimeout(resolve, 1500)
+        const { isConfirmed } = await this.alertQuestion(
+          "Crear espacio obligado",
+          "¿Confirmar?"
         );
-        this.sede.space = this.space;
-        this.loading = false;
+        if (isConfirmed) {
+          this.loading = true;
+
+          const {
+            data: { data: espacio_obligado },
+          } = await this.$http.post(`/espacios_obligados/`, {
+            ...this.nuevoEspacioObligado,
+            ...{ sede_id: this.sede.id },
+          });
+          const {
+            data: { data: entidades },
+          } = await this.$http.get("/entidades/");
+          this.entities = entidades;
+
+          this.loading = false;
+          this.espacioObligado = espacio_obligado;
+
+          this.alertSuccess(
+            "Espacio Obligado",
+            "El espacio se creo correctamente"
+          );
+        }
       } catch (error) {}
     },
 
-    async requestRepresentation() {
-      const { isConfirmed } = await this.alertQuestion(
-        "Solicitud de representación",
-        "¿Confirmar?"
-      );
-      // console.log(isConfirmed);
-      if (isConfirmed) {
-        this.loading = true;
-        const response = await new Promise((resolve) =>
-          setTimeout(resolve, 1500)
+    async solicitarRepresentacion() {
+      try {
+        const { isConfirmed } = await this.alertQuestion(
+          "Solicitud de representación",
+          "¿Confirmar?"
         );
+        if (isConfirmed) {
+          this.loading = true;
+
+          await this.$http.post(
+            `/solicitar_administracion/${this.espacioObligado.id}`
+          );
+          this.loading = false;
+          this.espacioObligado.solicitado = true;
+          this.alertSuccess(
+            "Solicitud enviada!",
+            "En breve se analizará para ser aprobada"
+          );
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
         this.loading = false;
-        this.sede.space.pending = true;
-        this.alertSuccess(
-          "Solicitud enviada!",
-          "En breve se analizará para ser aprobada"
-        );
       }
-    },
-
-    saveEntity() {
-      this.entities.push(this.newEntity);
-      this.entity = this.newEntity.cod;
-      this.sedes[this.entity] = [];
-      this.sedes[this.entity].push(this.newSede);
-      this.$nextTick(() => {
-        this.sede = this.newSede;
-      });
-      this.openEntity = false;
-    },
-
-    saveSede() {
-      this.sedes[this.entity].push(this.newSede);
-      this.$nextTick(() => {
-        this.sede = this.newSede;
-      });
-            this.openSede = false;
     },
   },
   watch: {
-    entity() {
+    entidad() {
       this.sede = null;
     },
     async sede() {
-      if (this.sede) {
-        this.loading = true;
-        const response = await new Promise((resolve) =>
-          setTimeout(resolve, 1500)
-        );
-        this.loading = false;
-      }
+      try {
+        if (this.sede) {
+          this.loading = true;
+          console.log(this.sede);
+          if (this.sede.espacio_obligado) {
+            const {
+              data: { data: espacio },
+            } = await this.$http.get(
+              `/espacios_obligados/?sede=${this.sede.id}`
+            );
+            this.espacioObligado = espacio;
+          } else {
+            const response = await new Promise((resolve) =>
+              setTimeout(resolve, 1000)
+            );
+          }
+          this.loading = false;
+        }
+      } catch (error) {}
     },
   },
 };
