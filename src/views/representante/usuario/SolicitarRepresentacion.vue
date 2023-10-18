@@ -118,8 +118,10 @@
             Solicitar representación
           </v-btn>
           <div v-else class="d-flex justify-center">
-            <p class="font-weight-semibold mr-2">Solicitud enviada</p>
-            <v-icon icon="mdi-check-circle-outline" color="success"></v-icon>
+            <v-chip color="success">
+              <span class="mr-1">SOLICITUD ENVIADA</span>
+            </v-chip>
+            <!-- <p class="font-weight-semibold mr-2">Solicitud enviada</p> -->
           </div>
           <v-spacer></v-spacer>
         </v-card-actions>
@@ -421,7 +423,6 @@ export default {
       try {
         if (this.sede) {
           this.loading = true;
-          console.log(this.sede);
           if (this.sede.espacio_obligado) {
             const {
               data: { data: espacio },
@@ -433,6 +434,7 @@ export default {
             const response = await new Promise((resolve) =>
               setTimeout(resolve, 1000)
             );
+             this.espacioObligado = null
           }
           this.loading = false;
         }
