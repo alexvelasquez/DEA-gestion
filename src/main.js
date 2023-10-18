@@ -18,6 +18,9 @@ const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 
 import GlobalMixin from './mixins/global'
+
+import moment from  'moment'
+
 const app = createApp(App)
     .use(router)
     .use(vuetify)
@@ -25,4 +28,5 @@ const app = createApp(App)
     .use(VueSweetalert2)
     .mixin(GlobalMixin)
 app.config.globalProperties.$http = Axios
+app.config.globalProperties.$moment = moment
 app.mount('#app')
