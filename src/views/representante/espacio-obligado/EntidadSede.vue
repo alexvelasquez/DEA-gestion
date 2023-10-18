@@ -9,6 +9,7 @@
           <v-row>
             <v-col cols="12">
               <v-text-field
+                readonly
                 v-model="sede.entidad.cuit"
                 label="CUIT"
                 placeholder="11-123456789-1"
@@ -18,6 +19,7 @@
               >
               </v-text-field>
               <v-text-field
+                readonly
                 v-model="sede.entidad.razon_social"
                 label="Razón Social"
                 placeholder="Coca Cola"
@@ -29,12 +31,6 @@
             </v-col>
           </v-row>
         </v-card-text>
-        <v-divider></v-divider>
-        <v-card-actions class="justify-end">
-          <v-btn variant="tonal" color="fourth" class="px-4"
-            >MODIFICAR ENTIDAD</v-btn
-          >
-        </v-card-actions>
       </v-card>
     </v-col>
     <v-col cols="12">
@@ -44,8 +40,9 @@
       <v-card class="mt-1">
         <v-card-text class="mt-2">
           <v-row>
-            <v-col cols="12" md="6">
+            <v-col cols="12" md="4">
               <v-select
+                readonly
                 v-model="sede.provincia_id"
                 label="Provincia"
                 variant="outlined"
@@ -56,8 +53,42 @@
               >
               </v-select>
             </v-col>
-            <v-col cols="12" md="6">
+            <v-col cols="12" md="4">
+              <v-select
+                v-model="sede.sector"
+                label="Sector (*)"
+                variant="outlined"
+                density="compact"
+                item-title="nombre"
+                item-value="id"
+                value="publico"
+                :items="[
+                  {
+                    nombre: 'Público',
+                    id: 'publico',
+                  },
+                  {
+                    nombre: 'Privado',
+                    id: 'privado',
+                  },
+                ]"
+              >
+              </v-select>
+            </v-col>
+            <v-col cols="4">
               <v-text-field
+                v-model="sede.tipo"
+                label="Tipo"
+                variant="outlined"
+                density="compact"
+                placeholder="tipo"
+                persistent-placeholder=""
+              >
+              </v-text-field>
+            </v-col>
+            <v-col cols="12" md="4" class="mt-md-n5">
+              <v-text-field
+                readonly
                 v-model="sede.direccion"
                 label="Dirección"
                 placeholder="Calle 46 n° 596 "
@@ -70,7 +101,7 @@
             <v-col cols="12" md="4" class="mt-md-n5">
               <v-text-field
                 v-model="sede.latitud"
-                label="Latitud"
+                label="Latitud (*)"
                 placeholder="-34.91854570891282"
                 variant="outlined"
                 density="compact"
@@ -81,7 +112,7 @@
             <v-col cols="12" md="4" class="mt-md-n5">
               <v-text-field
                 v-model="sede.longitud"
-                label="Longitud"
+                label="Longitud (*)"
                 placeholder="-57.962107304601005"
                 variant="outlined"
                 density="compact"
@@ -89,10 +120,10 @@
               >
               </v-text-field>
             </v-col>
-            <v-col cols="12" md="4" class="mt-md-n5">
+            <v-col cols="12" md="3" class="mt-md-n5">
               <v-text-field
                 v-model="sede.superficie"
-                label="Superficie"
+                label="Superficie (*)"
                 placeholder="54 mt2"
                 variant="outlined"
                 density="compact"
@@ -100,10 +131,10 @@
               >
               </v-text-field>
             </v-col>
-            <v-col cols="12" md="4" class="mt-md-n5">
+            <v-col cols="12" md="3" class="mt-md-n5">
               <v-text-field
                 v-model="sede.cantidad_pisos"
-                label="Pisos"
+                label="Pisos (*)"
                 placeholder="4"
                 variant="outlined"
                 density="compact"
@@ -111,10 +142,10 @@
               >
               </v-text-field>
             </v-col>
-            <v-col cols="12" md="4" class="mt-md-n5">
+            <v-col cols="12" md="3" class="mt-md-n5">
               <v-text-field
                 v-model="sede.cantidad_personas_externas"
-                label="Personas externas"
+                label="Personas externas (*)"
                 placeholder="10"
                 variant="outlined"
                 density="compact"
@@ -122,10 +153,10 @@
               >
               </v-text-field>
             </v-col>
-            <v-col cols="12" md="4" class="mt-md-n5">
+            <v-col cols="12" md="3" class="mt-md-n5">
               <v-text-field
                 v-model="sede.cantidad_personas_estables"
-                label="Personas estables"
+                label="Personas estables (*)"
                 placeholder="5"
                 variant="outlined"
                 density="compact"
@@ -134,19 +165,35 @@
               </v-text-field>
             </v-col>
           </v-row>
-          <v-divider></v-divider>
-          <div class="d-flex justify-space-between align-center">
-            <p class="mt-4 mb-4">RESPONSABLES</p>
-            <v-btn
-              @click="responsables.push({})"
-              variant="text"
-              color="fourth"
-              size="small"
-              class="mt-1"
-              icon="mdi-plus-circle-outline"
-            >
-            </v-btn>
-          </div>
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions class="justify-end">
+          <v-btn
+            @click="modificarSede()"
+            variant="tonal"
+            color="fourth"
+            class="px-4"
+            >MODIFICAR SEDE</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-col>
+
+    <v-col cols="12">
+      <v-alert class="text-fourth" border="start" border-color="fourth">
+        <div class="d-flex align-center justify-space-between">
+          <strong> RESPONSABLES </strong>
+          <v-btn
+            @click="responsables.push({})"
+            variant="tonal"
+            color="fourth"
+            class="px-8"
+            >NUEVO</v-btn
+          >
+        </div>
+      </v-alert>
+      <v-card class="mt-1">
+        <v-card-text class="mt-2">
           <v-row
             v-for="(responsable, i) in responsables"
             :key="i"
@@ -155,6 +202,7 @@
             <v-col cols="12" md="4">
               <v-text-field
                 v-model="responsable.nombre"
+                :readonly="responsable.id"
                 label="Nombre y Apellido"
                 placeholder="Juan Carlos"
                 variant="outlined"
@@ -166,6 +214,7 @@
             <v-col cols="12" md="4">
               <v-text-field
                 v-model="responsable.email"
+                :readonly="responsable.id"
                 label="Correo Electrónico"
                 placeholder="juancarlos@gmail.com"
                 variant="outlined"
@@ -174,9 +223,10 @@
               >
               </v-text-field>
             </v-col>
-            <v-col cols="12" md="3">
+            <v-col cols="12" :md="responsable.id ? '4' : '3'">
               <v-text-field
                 v-model="responsable.telefono"
+                :readonly="responsable.id"
                 label="Teléfono"
                 placeholder="221-6767418"
                 variant="outlined"
@@ -185,9 +235,9 @@
               >
               </v-text-field>
             </v-col>
-            <v-col cols="12" md="1">
+            <v-col cols="12" md="1" v-if="!responsable.id">
               <div class="mt-2">
-                <span @click="guardarResponsable(responsable)">
+                <span @click="guardarResponsable(i)">
                   <v-icon
                     color="success"
                     class="mr-1 cursor-pointer"
@@ -198,7 +248,7 @@
                     >Guardar</v-tooltip
                   >
                 </span>
-                <span>
+                <span @click="responsables.splice(i, 1)">
                   <v-icon color="error" icon="mdi-delete-outline"> </v-icon>
                   <v-tooltip activator="parent" location="top"
                     >Eliminar</v-tooltip
@@ -208,18 +258,14 @@
             </v-col>
           </v-row>
         </v-card-text>
-        <v-divider></v-divider>
-        <v-card-actions class="justify-end">
-          <v-btn variant="tonal" color="fourth" class="px-4"
-            >MODIFICAR SEDE</v-btn
-          >
-        </v-card-actions>
       </v-card>
     </v-col>
   </v-row>
 </template>
 <script>
+import alerts from "../../../mixins/sweetalert";
 export default {
+  mixins: [alerts],
   data() {
     return {
       responsables: [],
@@ -231,22 +277,86 @@ export default {
     };
   },
   async created() {
-    const { sede } = this.espacioObligado;
-    this.sede = { ...sede };
-    const {
-      data: { data: provincias },
-    } = await this.$http("/provincias/");
-    this.provincias = provincias;
+    try {
+      const { sede } = this.espacioObligado;
+      this.sede = { ...sede };
+
+      const {
+        data: { data: provincias },
+      } = await this.$http("/provincias/");
+      this.provincias = provincias;
+
+      const {
+        data: { data: responsables },
+      } = await this.$http(`/responsables/${sede.id}`);
+      this.responsables = responsables;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.loadingApp = false;
+    }
   },
 
   methods: {
-    async guardarResponsable(nuevoResponsable) {
-      const {
-        data: { data: responsable },
-      } = await this.$http.post(
-        `/responsables/${this.sede.id}`,
-        nuevoResponsable
-      );
+    async modificarSede() {
+      try {
+        const { isConfirmed } = await this.alertQuestion(
+          "Modificar sede",
+          "¿Confirmar?"
+        );
+
+        const {
+          sector,
+          tipo,
+          superficie,
+          latitud,
+          longitud,
+          cantidad_pisos,
+          cantidad_personas_externas,
+          cantidad_personas_estables,
+        } = this.sede;
+
+        if (isConfirmed) {
+          const {
+            data: { data: responsable },
+          } = await this.$http.post(`/sedes/${this.sede.id}`, {
+            sector: sector,
+            tipo: tipo,
+            superficie: superficie,
+            latitud: latitud,
+            longitud: longitud,
+            cantidad_pisos: cantidad_pisos,
+            cantidad_personas_externas: cantidad_personas_externas,
+            cantidad_personas_estables: cantidad_personas_estables,
+          });
+          this.alertSuccess("Modificado correctamente", "");
+
+          this.responsables[indiceResponsable] = responsable;
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async guardarResponsable(indiceResponsable) {
+      try {
+        const { isConfirmed } = await this.alertQuestion(
+          "Guardar responsable",
+          "¿Confirmar?"
+        );
+        if (isConfirmed) {
+          const {
+            data: { data: responsable },
+          } = await this.$http.post(
+            `/responsables/${this.sede.id}`,
+            this.responsables[indiceResponsable]
+          );
+          this.alertSuccess("Creado correctamente", "");
+
+          this.responsables[indiceResponsable] = responsable;
+        }
+      } catch (error) {
+        console.log(error);
+      }
     },
   },
   computed: {
