@@ -1,20 +1,11 @@
 <template>
-  <v-row class="mt-2">
+  <v-row class="mt-2" style="min-height: 70vh">
     <v-col cols="12">
-      <v-row>
-        <v-col cols="12" md="10">
-          <v-text-field
-            placeholder="Ingresar un nombre"
-            label="Buscar"
-            variant="outlined"
-            persistent-placeholder
-            density="compact"
-            append-inner-icon="mdi-magnify"
-          >
-          </v-text-field>
-        </v-col>
+      <v-row class="mb-4">
+        <v-col cols="12" md="10"> </v-col>
         <v-col cols="12" md="2">
           <v-btn
+            @click="dialog = true"
             block
             color="primary"
             size="large"
@@ -22,13 +13,15 @@
             >NUEVO</v-btn
           >
         </v-col>
+        <v-dialog v-model="dialog" width="650" z-index="1" persistent>
+          <ModalDea @close="dialog = false" :marcas="marcas" />
+        </v-dialog>
       </v-row>
       <v-expansion-panels v-model="panels" multiple>
-        <v-expansion-panel v-for="i in 3" :key="i" class="">
+        <v-expansion-panel v-for="(dea, i) in deas" :key="i" class="">
           <v-expansion-panel-title class="py-6 bg-tertiary" disable-icon-rotate>
-            DEA N° {{ i }}
+            {{ dea.nombre }}
             <template v-slot:actions>
-
               <v-icon color="fifth" icon="mdi-check-decagram"> </v-icon>
             </template>
           </v-expansion-panel-title>
@@ -36,24 +29,42 @@
             <v-card elevation="0">
               <v-card-text>
                 <v-row no-gutters justify="end">
-                  <v-chip color="info" size="small" prepend-icon="mdi-update">
-                    Fecha Actualización: 13/05/2023
+                  <v-chip
+                    color="info"
+                    size="small"
+                    prepend-icon="mdi-update"
+                    v-if="dea.fecha_ultimo_mantenimiento"
+                  >
+                    Fecha Actualización:
+                    {{
+                      $moment(dea.fecha_ultimo_mantenimiento).format(
+                        "DD/MM/YYYY"
+                      )
+                    }}
                   </v-chip>
                   <v-chip
-                    color="success"
+                    :color="dea.activo ? 'success' : 'error'"
                     size="small"
                     class="ml-2"
-                    prepend-icon="mdi-check-decagram"
+                    :prepend-icon="
+                      dea.activo
+                        ? 'mdi-check-decagram'
+                        : 'mdi-alert-decagram-outline'
+                    "
                   >
-                    Activo
+                    {{ dea.activo ? "Activo" : " Inactivo" }}
                   </v-chip>
                   <v-chip
-                    prepend-icon="mdi-handshake-outline"
+                    :prepend-icon="
+                      dea.solidario
+                        ? 'mdi-handshake-outline'
+                        : 'mdi-marker-cancel'
+                    "
                     size="small"
                     class="ml-2"
                     color="fifth"
                   >
-                    Solidario
+                    {{ dea.solidario ? "Solidario" : "No solidario" }}
                   </v-chip>
                 </v-row>
                 <v-alert
@@ -65,7 +76,7 @@
                   <template v-slot:title>
                     <span class="text-caption font-weight-bold">MARCA</span>
                   </template>
-                  <p class="text-fifth text-caption">KINGSTON</p>
+                  <p class="text-fifth text-caption">{{ dea.marca }}</p>
                 </v-alert>
                 <v-alert
                   border="start"
@@ -76,7 +87,7 @@
                   <template v-slot:title>
                     <span class="text-caption font-weight-bold">MODELO</span>
                   </template>
-                  <p class="text-fifth text-caption">MXF-SJHK-SS</p>
+                  <p class="text-fifth text-caption">{{ dea.modelo }}</p>
                 </v-alert>
                 <v-alert
                   border="start"
@@ -90,13 +101,36 @@
                     >
                   </template>
                   <p class="text-fifth text-caption">
-                    15698956-15688956-15698956-15698956
+                    {{ dea.numero_serie }}
                   </p>
+                </v-alert>
+                <v-alert
+                  border="start"
+                  color="tertiary"
+                  variant="outlined"
+                  class="mt-2"
+                >
+                  <template v-slot:title>
+                    <div
+                      class="w-100 d-flex justify-space-between align-center"
+                    >
+                      <span class="text-caption font-weight-bold"
+                        >REPARACIONES</span
+                      >
+                      <p
+                        @click="reparaciones(dea.id)"
+                        class="text-tertiary text-decoration-underline cursor-pointer text-caption"
+                      >
+                        ver
+                      </p>
+                    </div>
+                  </template>
                 </v-alert>
               </v-card-text>
               <v-card-actions class="px-4 justify-space-between">
                 <div>
                   <v-btn
+                    @click="reparar(dea.id)"
                     variant="flat"
                     class="px-4"
                     color="warning"
@@ -127,11 +161,72 @@
   </v-row>
 </template>
 <script>
+import axios from "axios";
+import ModalDea from "../../../components/modals/Dea.vue";
+import alerts from "../../../mixins/sweetalert";
 export default {
+  components: { ModalDea },
+  mixins: [alerts],
   data() {
     return {
       panels: [0],
+      dialog: false,
+      marcas: [],
+      deas: [],
     };
+  },
+  async created() {
+    try {
+      this.loadingApp = true;
+      const { data: marcas } = await axios(
+        "https://api.claudioraverta.com/deas/"
+      );
+
+      this.marcas = marcas;
+
+      const {
+        data: { data: deas },
+      } = await this.$http(`/deas/${this.$route.params.espacio}`);
+
+      this.deas = deas;
+
+      this.marcas = marcas;
+    } catch (error) {
+    } finally {
+      this.loadingApp = false;
+    }
+  },
+  methods: {
+    async reparaciones(dea) {
+      const response = await this.$http(`/reparacion/dea/${dea}`);
+    },
+
+    async reparar(dea) {
+      try {
+        this.loadingApp = true;
+        const { data } = await this.$http.post(`/reparacion/dea/${dea}`, {
+          fecha_inicio: new Date(),
+          fecha_fin: new Date(),
+          tecnico: "reparacion",
+        });
+        this.loadingApp = false;
+
+        this.alertSuccess("Dea en reparación");
+        var {
+          data: { data: espacio_obligado },
+        } = await this.$http(
+          `/espacios_obligados/${this.$route.params.espacio}`
+        );
+
+        localStorage.setItem(
+          "espacio-obligado",
+          JSON.stringify(espacio_obligado)
+        );
+      } catch (error) {
+      } finally {
+        this.loadingApp = false;
+      }
+    },
   },
 };
 </script>
