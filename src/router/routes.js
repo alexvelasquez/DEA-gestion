@@ -1,4 +1,5 @@
 import Home from "../views/Home.vue";
+import Public from "../views/public/index.vue";
 import Redireccion from '../views/Redireccion.vue'
 
 /** AUTH */
@@ -32,6 +33,15 @@ const routes = [
     meta: {
       auth: false,
       title: 'Home'
+    },
+  },
+  {
+    path: "/public",
+    name: "public",
+    component: Public,
+    meta: {
+      auth: false,
+      title: 'Deas'
     },
   },
 
