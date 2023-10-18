@@ -46,7 +46,7 @@ export default {
         },
         {
           id: "DDJJ",
-          name: "DECLARACIÓN JURADA",
+          name: "CONDICIONES",
           icon: "mdi-file-sign",
           to: {
             name: "ddjj",
