@@ -56,7 +56,7 @@ export default {
         "En proceso de ser Cardio-Asistido": {
           icon: "mdi-clock-time-three-outline",
           color: "warning",
-          nombre: "EN PROCESO",
+          nombre: "EN PROCESO DE SER CADIO-ASISTIDO",
         },
         DDJJ: {
           icon: "mdi-draw",
