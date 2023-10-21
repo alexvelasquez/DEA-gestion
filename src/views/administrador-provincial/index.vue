@@ -51,7 +51,7 @@ export default {
       });
       localStorage.setItem("token", access_token);
 
-      const { data: user } = await this.$http.get("/users/me");
+      const { data: user } = await this.$http.get("/users/me/");
       this.user = user;
     } catch (error) {
       console.log(error);

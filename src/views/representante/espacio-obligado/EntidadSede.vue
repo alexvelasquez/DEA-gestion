@@ -288,7 +288,7 @@ export default {
 
       const {
         data: { data: responsables },
-      } = await this.$http(`/responsables/${sede.id}`);
+      } = await this.$http(`/responsables/${sede.id}/`);
       this.responsables = responsables;
     } catch (error) {
       console.log(error);
@@ -319,7 +319,7 @@ export default {
         if (isConfirmed) {
           const {
             data: { data: responsable },
-          } = await this.$http.post(`/sedes/${this.sede.id}`, {
+          } = await this.$http.post(`/sedes/${this.sede.id}/`, {
             sector: sector,
             tipo: tipo,
             superficie: superficie,
@@ -347,7 +347,7 @@ export default {
           const {
             data: { data: responsable },
           } = await this.$http.post(
-            `/responsables/${this.sede.id}`,
+            `/responsables/${this.sede.id}/`,
             this.responsables[indiceResponsable]
           );
           this.alertSuccess("Creado correctamente", "");
