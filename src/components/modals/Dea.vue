@@ -99,15 +99,20 @@ export default {
           "¿Confirmar?"
         );
         if (isConfirmed) {
+          this.loadingApp = true;
           const {
             data: { data: dea },
           } = await this.$http.post(`/deas/`, {
             ...this.dea,
             ...{ marca: this.dea.marca.marca },
           });
+          this.loadingApp = false;
           this.alertSuccess("Creado correctamente", "");
         }
-      } catch (error) {}
+      } catch (error) {
+      } finally {
+        this.loadingApp = false;
+      }
     },
   },
   watch: {
