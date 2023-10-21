@@ -399,7 +399,7 @@ export default {
           this.loading = true;
 
           await this.$http.post(
-            `/solicitar_administracion/${this.espacioObligado.id}`
+            `/solicitar_administracion/${this.espacioObligado.id}/`
           );
           this.loading = false;
           this.espacioObligado.solicitado = true;
@@ -427,7 +427,7 @@ export default {
             const {
               data: { data: espacio },
             } = await this.$http.get(
-              `/espacios_obligados/?sede=${this.sede.id}`
+              `/espacios_obligados/?sede=${this.sede.id}/`
             );
             this.espacioObligado = espacio;
           } else {

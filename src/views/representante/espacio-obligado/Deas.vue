@@ -198,13 +198,13 @@ export default {
   },
   methods: {
     async reparaciones(dea) {
-      const response = await this.$http(`/reparacion/dea/${dea}`);
+      const response = await this.$http(`/reparacion/dea/${dea}/`);
     },
 
     async reparar(dea) {
       try {
         this.loadingApp = true;
-        const { data } = await this.$http.post(`/reparacion/dea/${dea}`, {
+        const { data } = await this.$http.post(`/reparacion/dea/${dea}/`, {
           fecha_inicio: new Date(),
           fecha_fin: new Date(),
           tecnico: "reparacion",
@@ -215,7 +215,7 @@ export default {
         var {
           data: { data: espacio_obligado },
         } = await this.$http(
-          `/espacios_obligados/${this.$route.params.espacio}`
+          `/espacios_obligados/${this.$route.params.espacio}/`
         );
 
         localStorage.setItem(

@@ -59,10 +59,10 @@ export default {
       try {
         const {
           data: { access_token },
-        } = await this.$http.post("/login", this.usuario[option.rol]);
+        } = await this.$http.post("/login/", this.usuario[option.rol]);
         localStorage.setItem("token", access_token);
 
-        const { data: user } = await this.$http.get("/users/me");
+        const { data: user } = await this.$http.get("/users/me/");
         this.user = user;
         this.$router.push(option.to);
       } catch (error) {
