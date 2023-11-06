@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="text-center">
+    <div class="text-center" v-if="espacioObligado">
       <v-snackbar
         location="top center"
         color="primary"
@@ -23,68 +23,56 @@
   </div>
 </template>
 <script>
+import { useEspacioStore } from "../../../stores/espacio";
+import { mapWritableState } from "pinia";
 export default {
   data() {
     return {
       snackbar: true,
-      menu: [
-        {
-          id: "ENTIDAD-SEDE",
-          name: "ENTIDAD/SEDE",
-          icon: "mdi-office-building-marker",
-          to: {
-            name: "entidad-sede",
-          },
-        },
-        {
-          id: "DEAS",
-          name: "DEAS",
-          icon: "mdi-heart-pulse",
-          to: {
-            name: "deas",
-          },
-        },
-        {
-          id: "DDJJ",
-          name: "CONDICIONES",
-          icon: "mdi-file-sign",
-          to: {
-            name: "ddjj",
-          },
-        },
-        {
-          id: "MUERTES-SUBITAS",
-          name: "MUERTES SÚBITAS",
-          icon: "mdi-account-minus",
-          to: {
-            name: "muertes-subita",
-          },
-        },
-      ],
     };
   },
-  beforeMount() {
-    this.menu = this.menu.map((m) => {
-      if (!this.espacioObligado.puede_completar_ddjj_dea) {
-        if (m.id == "DDJJ") {
-          m.deshabilitado = true;
-        }
-        m.hover = "Debe registar al menos un DEA";
-      }
-      if (!this.espacioObligado.puede_cargar_dea) {
-        if (m.id == "DEAS") {
-          m.deshabilitado = true;
-        }
-        m.hover = "Debe completar los campos de la ENTIDAD/SEDE";
-      }
-      return m;
-    });
-    this.menuUser = this.menu;
-  },
   computed: {
-    espacioObligado() {
-      return JSON.parse(localStorage.getItem("espacio-obligado"));
-    },
+    ...mapWritableState(useEspacioStore, ["menu"]),
+  },
+  async created() {
+    const opciones = [
+      {
+        id: "DEAS",
+        name: "DEAS",
+        icon: "mdi-heart-pulse",
+        to: {
+          name: "deas",
+        },
+        validacion: "entidad/sede",
+      },
+      {
+        id: "DDJJ",
+        name: "CONDICIONES",
+        icon: "mdi-file-sign",
+        to: {
+          name: "ddjj",
+        },
+        validacion: "ddjj",
+      },
+      {
+        id: "MUERTES-SUBITAS",
+        name: "MUERTES SÚBITAS",
+        icon: "mdi-account-minus",
+        to: {
+          name: "muertes-subita",
+        },
+        validacion: "ddjj",
+      },
+    ];
+    await this.updateEspacioObligado(this.$route.params.espacio);
+    const misMenus = opciones.filter((o) => {
+      if (o.validacion == "entidad/sede") {
+        return this.espacioObligado?.puede_cargar_dea;
+      } else {
+        return this.espacioObligado?.puede_completar_ddjj_dea;
+      }
+    });
+    this.menuUser = this.menu.concat(misMenus);
   },
   methods: {
     back() {

@@ -21,6 +21,7 @@
   </div>
 </template>
 <script>
+import 'animate.css';
 export default {
   data() {
     return {
@@ -31,27 +32,16 @@ export default {
     if (this.$route.query.rol) {
       localStorage.removeItem("espacio-obligado");
       this.title = "VOLVIENDO AL MENÚ";
+      this.espacioObligado = null;
     }
   },
   async mounted() {
     if (this.$route.query.rol) {
-      const response = await new Promise((resolve) =>
-        setTimeout(resolve, 2000)
-      );
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       this.rol = "REPRESENTANTE";
       this.$router.push("/representante");
     } else {
-      const response = await new Promise((resolve) =>
-        setTimeout(resolve, 1500)
-      );
-      var {
-        data: { data: espacio_obligado },
-      } = await this.$http(`/espacios_obligados/${this.$route.params.espacio}`);
-
-      localStorage.setItem(
-        "espacio-obligado",
-        JSON.stringify(espacio_obligado)
-      );
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       this.rol = "DEA";
       this.$router.push({ name: "entidad-sede", params: this.$route.params });
     }

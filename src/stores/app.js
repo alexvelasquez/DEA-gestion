@@ -15,6 +15,9 @@ export const useAppStore = defineStore('app', {
                 "certificador": "CERTIFICADOR"
             }
             return this.user ? roles[this.user.rol] : null
+        },
+        keysMenuUser(){
+            return this.menuUser.map(m=>m.id)
         }
     },
     persist: [

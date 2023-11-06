@@ -29,10 +29,11 @@
                 v-model="dea.marca"
                 :items="marcas"
                 item-title="marca"
+                item-value="id"
                 variant="outlined"
                 density="compact"
-                return-object
                 persistent-placeholder=""
+                @update:modelValue="dea.modelo = null"
               ></v-select>
             </v-col>
             <v-col cols="12" md="6">
@@ -67,8 +68,12 @@
     </v-card-text>
     <v-divider></v-divider>
     <v-card-actions class="justify-center">
-      <v-btn color="primary" @click="$emit('close')">CERRAR</v-btn>
-      <v-btn color="primary" @click="guardarDea()">GUARDAR</v-btn>
+      <v-btn color="primary" variant="tonal" @click="$emit('close')"
+        >CERRAR</v-btn
+      >
+      <v-btn color="primary" variant="tonal" @click="guardarDea()"
+        >GUARDAR</v-btn
+      >
     </v-card-actions>
   </v-card>
 </template>
@@ -76,7 +81,7 @@
 import axios from "axios";
 import alerts from "../../mixins/sweetalert";
 export default {
-  props: ["marcas"],
+  props: ["marcas", "deaSeleccionado"],
   mixins: [alerts],
   data() {
     return {
@@ -91,6 +96,11 @@ export default {
       modelos: [],
     };
   },
+  beforeMount() {
+    if (this.deaSeleccionado) {
+      this.dea = { ...this.dea, ...this.deaSeleccionado };
+    }
+  },
   methods: {
     async guardarDea() {
       try {
@@ -99,15 +109,18 @@ export default {
           "¿Confirmar?"
         );
         if (isConfirmed) {
+          if (!this.dea.fecha_ultimo_mantenimiento)
+            delete this.dea.fecha_ultimo_mantenimiento;
           this.loadingApp = true;
           const {
             data: { data: dea },
           } = await this.$http.post(`/deas/`, {
             ...this.dea,
-            ...{ marca: this.dea.marca.marca },
+            ...{ marca: this.dea.marca.id },
           });
           this.loadingApp = false;
-          this.alertSuccess("Creado correctamente", "");
+          this.$emit("save");
+          this.alertSuccess("DEA", "Creado con éxito");
         }
       } catch (error) {
       } finally {

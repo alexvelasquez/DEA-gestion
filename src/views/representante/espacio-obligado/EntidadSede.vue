@@ -61,7 +61,6 @@
                 density="compact"
                 item-title="nombre"
                 item-value="id"
-                value="publico"
                 :items="[
                   {
                     nombre: 'Público',
@@ -72,6 +71,7 @@
                     id: 'privado',
                   },
                 ]"
+                persistent-placeholder
               >
               </v-select>
             </v-col>
@@ -81,8 +81,8 @@
                 label="Tipo"
                 variant="outlined"
                 density="compact"
-                placeholder="tipo"
-                persistent-placeholder=""
+                placeholder=""
+                persistent-placeholder
               >
               </v-text-field>
             </v-col>
@@ -91,7 +91,7 @@
                 readonly
                 v-model="sede.direccion"
                 label="Dirección"
-                placeholder="Calle 46 n° 596 "
+                placeholder=""
                 variant="outlined"
                 density="compact"
                 persistent-placeholder
@@ -263,24 +263,30 @@
   </v-row>
 </template>
 <script>
+import { useEspacioStore } from "../../../stores/espacio";
+import { mapState } from "pinia";
 import alerts from "../../../mixins/sweetalert";
 export default {
   mixins: [alerts],
   data() {
     return {
       responsables: [],
-
       provincias: [],
       sede: {
         entidad: {},
       },
     };
   },
+  computed: {
+    ...mapState(useEspacioStore, ["menuValidacionDEA"]),
+  },
   async created() {
     try {
+      await this.updateEspacioObligado(this.$route.params.espacio);
+
       const { sede } = this.espacioObligado;
       this.sede = { ...sede };
-
+      this.sede.sector = this.sede.sector ? this.sede.sector : "publico";
       const {
         data: { data: provincias },
       } = await this.$http("/provincias/");
@@ -329,9 +335,13 @@ export default {
             cantidad_personas_externas: cantidad_personas_externas,
             cantidad_personas_estables: cantidad_personas_estables,
           });
-          this.alertSuccess("Modificado correctamente", "");
-
-          this.responsables[indiceResponsable] = responsable;
+          const { isConfirmed } = await this.alertSuccess(
+            "SEDE",
+            "Cambios realizados."
+          );
+          if (isConfirmed) {
+            await this.updateEspacioObligado(this.$route.params.espacio);
+          }
         }
       } catch (error) {
         console.log(error);
@@ -350,7 +360,7 @@ export default {
             `/responsables/${this.sede.id}/`,
             this.responsables[indiceResponsable]
           );
-          this.alertSuccess("Creado correctamente", "");
+          this.alertSuccess("Responsable", "Creado con exito");
 
           this.responsables[indiceResponsable] = responsable;
         }
@@ -359,9 +369,14 @@ export default {
       }
     },
   },
-  computed: {
+  watch: {
     espacioObligado() {
-      return JSON.parse(localStorage.getItem("espacio-obligado"));
+      if (
+        this.espacioObligado?.puede_cargar_dea &&
+        !this.keysMenuUser.includes("DEAS")
+      ) {
+        this.menuUser = this.menuUser.concat(this.menuValidacionDEA);
+      }
     },
   },
 };

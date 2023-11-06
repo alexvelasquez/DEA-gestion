@@ -1,6 +1,9 @@
 <template>
-  <v-row class="mt-2" style="min-height: 70vh">
-    <v-col cols="12">
+  <v-row
+    class="mt-2"
+    style="min-height: 70vh; justify-content: center; align-items: center"
+  >
+    <v-col cols="12" v-if="deas.length">
       <v-row class="mb-4">
         <v-col cols="12" md="10"> </v-col>
         <v-col cols="12" md="2">
@@ -13,9 +16,6 @@
             >NUEVO</v-btn
           >
         </v-col>
-        <v-dialog v-model="dialog" width="650" z-index="1" persistent>
-          <ModalDea @close="dialog = false" :marcas="marcas" />
-        </v-dialog>
       </v-row>
       <v-expansion-panels v-model="panels" multiple>
         <v-expansion-panel v-for="(dea, i) in deas" :key="i" class="">
@@ -76,7 +76,9 @@
                   <template v-slot:title>
                     <span class="text-caption font-weight-bold">MARCA</span>
                   </template>
-                  <p class="text-fifth text-caption">{{ dea.marca }}</p>
+                  <p class="text-fifth text-caption">
+                    {{ dea.marca ? dea.marca.marca : null }}
+                  </p>
                 </v-alert>
                 <v-alert
                   border="start"
@@ -146,6 +148,7 @@
                   >
                 </div>
                 <v-btn
+                  @click="deaSeleccionado = dea"
                   variant="flat"
                   color="tertiary"
                   class="px-4"
@@ -158,6 +161,24 @@
         </v-expansion-panel>
       </v-expansion-panels>
     </v-col>
+    <div v-else class="d-flex flex-column justify-center align-center">
+      <v-icon
+        color="grey-lighten-2"
+        icon="mdi-text-box-search-outline"
+        size="200"
+      ></v-icon>
+      <v-btn @click="dialog = true" variant="text" color="primary"
+        >CREAR DEA</v-btn
+      >
+    </div>
+    <v-dialog v-model="dialog" width="650" z-index="1" persistent>
+      <ModalDea
+        @close="dialog = false"
+        :marcas="marcas"
+        @save="fetchDeas()"
+        :deaSeleccionado="deaSeleccionado"
+      />
+    </v-dialog>
   </v-row>
 </template>
 <script>
@@ -173,6 +194,7 @@ export default {
       dialog: false,
       marcas: [],
       deas: [],
+      deaSeleccionado: null,
     };
   },
   async created() {
@@ -184,19 +206,32 @@ export default {
 
       this.marcas = marcas;
 
-      const {
-        data: { data: deas },
-      } = await this.$http(`/deas/${this.$route.params.espacio}`);
-
-      this.deas = deas;
-
-      this.marcas = marcas;
+      await this.fetchDeas();
     } catch (error) {
     } finally {
       this.loadingApp = false;
     }
   },
   methods: {
+    getMarca(value) {
+      try {
+        const marca = this.marcas.find((m) => m.id == value);
+        return marca;
+      } catch (error) {
+        return null;
+      }
+    },
+    async fetchDeas() {
+      try {
+        this.dialog = false;
+        const {
+          data: { data: deas },
+        } = await this.$http(`/deas/${this.$route.params.espacio}/`);
+        this.deas = deas.map((d) => {
+          return { ...d, ...{ marca: this.getMarca(d.marca) } };
+        });
+      } catch (error) {}
+    },
     async reparaciones(dea) {
       const response = await this.$http(`/reparacion/dea/${dea}/`);
     },
@@ -226,6 +261,14 @@ export default {
       } finally {
         this.loadingApp = false;
       }
+    },
+  },
+  watch: {
+    deaSeleccionado() {
+      if (this.deaSeleccionado) this.dialog = true;
+    },
+    dialog() {
+      if (!this.dialog) this.deaSeleccionado = null;
     },
   },
 };
