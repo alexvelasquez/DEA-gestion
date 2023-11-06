@@ -68,13 +68,14 @@
       </v-list>
     </v-navigation-drawer>
     <v-main
+    
       class="d-flex align-center justify-center"
       style="min-height: 100vh"
     >
       <v-container v-if="$route.meta.auth">
         <v-system-bar
           class="py-4 mr-4"
-          style="width: calc((100% - 239px) - 0px); left: 239px"
+          style="width: calc((100% - 256px) - 0px); left: 256px; z-index:1"
         >
           <span class="font-weight-bold px-4">{{ $route.meta.title }}</span>
           <v-spacer></v-spacer>
@@ -105,5 +106,8 @@ export default {
 <style>
 .menu-user .v-list-item__prepend {
   display: block !important;
+}
+.menu-user{
+  z-index: 1 !important;
 }
 </style>
