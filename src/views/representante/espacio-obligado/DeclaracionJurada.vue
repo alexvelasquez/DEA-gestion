@@ -40,6 +40,7 @@
                 variant="outlined"
                 persistent-placeholder
                 density="compact"
+                v-model="ddjj.cantidad_deas"
               >
               </v-text-field>
             </v-col>
@@ -47,9 +48,37 @@
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions class="justify-end">
-          <v-btn variant="tonal" color="fourth" class="px-4">GUARDAR</v-btn>
+          <v-btn variant="tonal" color="fourth" class="px-4" @click="guardarDdjj()">GUARDAR</v-btn>
         </v-card-actions>
       </v-card>
     </v-col>
   </v-row>
 </template>
+<script>
+import axios from "axios";
+// import alerts from "../../mixins/sweetalert";
+import { espaciosObligadosStore } from "../../../stores/espacioObligado";
+import { mapWritableState } from "pinia";
+
+export default {
+  data() {
+    return {
+      ddjj: {},
+      modelos: [],
+    };
+  },
+  computed: {
+  },
+  async created() {
+    await this.updateEspacioObligado(this.$route.params.espacio)
+    const { ddjj } = this.espacioObligado
+    this.ddjj = {...ddjj}
+    console.log(ddjj)
+  },
+  methods: {
+    guardarDdjj() {
+      espaciosObligadosStore().updateDdjjEspaciosObligados(this.$route.params.espacio,ddjj)
+    },
+  },
+};
+</script>

@@ -28,17 +28,12 @@ export default {
       title: "INGRESANDO AL ESPACIO",
     };
   },
-  async beforeMount() {
-    if (this.$route.query.rol) {
-      localStorage.removeItem("espacio-obligado");
-      this.title = "VOLVIENDO AL MENÚ";
-      this.espacioObligado = null;
-    }
-  },
   async mounted() {
     if (this.$route.query.rol) {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      this.title = "VOLVIENDO AL MENÚ";
+      this.espacioObligado = null;
       this.rol = "REPRESENTANTE";
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       this.$router.push("/representante");
     } else {
       await new Promise((resolve) => setTimeout(resolve, 2000));

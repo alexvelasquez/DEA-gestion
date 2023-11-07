@@ -15,7 +15,7 @@
       v-if="$route.meta.auth"
     >
       <template v-slot:prepend>
-        <v-list-item lines="two" class="bg-fourth">
+        <v-list-item lines="two" class="bg-fourth" v-if="user">
           <!-- <template v-slot:prepend>
           </template> -->
           <div class="ml-2 text-center">
@@ -93,9 +93,17 @@
   </v-layout>
 </template>
 <script>
+import { useAppStore } from './stores/app.js';
+
 export default {
+  data() {
+    return {
+      auth: useAppStore().isAuthenticated,
+    };
+  },
   methods: {
     logout() {
+      useAppStore().logOut();
       localStorage.removeItem("token");
       this.user = null;
       this.$router.push("/");

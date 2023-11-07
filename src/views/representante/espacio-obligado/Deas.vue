@@ -120,12 +120,17 @@
                         >REPARACIONES</span
                       >
                       <p
-                        @click="reparaciones(dea.id)"
+                        @click="getReparaciones(dea)"
                         class="text-tertiary text-decoration-underline cursor-pointer text-caption"
                       >
                         ver
                       </p>
                     </div>
+                  </template>
+                  <template v-slot:text>
+                    <p class="text-fifth text-caption" v-for="reparacion, i in dea.reparaciones" :key="i" >
+                      {{ reparacion.fecha_fin }}
+                    </p>
                   </template>
                 </v-alert>
               </v-card-text>
@@ -148,12 +153,12 @@
                   >
                 </div>
                 <v-btn
-                  @click="deaSeleccionado = dea"
+                  @click="eliminarDea(dea.id)"
                   variant="flat"
                   color="tertiary"
                   class="px-4"
                   append-icon="mdi-pencil"
-                  >EDITAR</v-btn
+                  >ELIMINAR</v-btn
                 >
               </v-card-actions>
             </v-card>
@@ -176,7 +181,6 @@
         @close="dialog = false"
         :marcas="marcas"
         @save="fetchDeas()"
-        :deaSeleccionado="deaSeleccionado"
       />
     </v-dialog>
   </v-row>
@@ -185,20 +189,27 @@
 import axios from "axios";
 import ModalDea from "../../../components/modals/Dea.vue";
 import alerts from "../../../mixins/sweetalert";
+import { deaStore } from "../../../stores/deas";
+import { mapWritableState } from "pinia";
+
 export default {
   components: { ModalDea },
   mixins: [alerts],
   data() {
     return {
       panels: [0],
+      panelsReparaciones: [],
       dialog: false,
       marcas: [],
       deas: [],
-      deaSeleccionado: null,
     };
+  },
+  computed: {
+    ...mapWritableState(deaStore, ["dataDea"]),
   },
   async created() {
     try {
+      deaStore().fetchDataDea(this.$route.params.espacio)
       this.loadingApp = true;
       const { data: marcas } = await axios(
         "https://api.claudioraverta.com/deas/"
@@ -206,10 +217,25 @@ export default {
 
       this.marcas = marcas;
 
-      await this.fetchDeas();
+      // await this.fetchDeas();
+      const {
+        data: { data: deas },
+      } = await this.$http(`/deass/${this.$route.params.espacio}`);
+
+      const {
+        data: { data: reparaciones },
+      } = await this.$http(`/reparacion/dea/${this.$route.params.espacio}`);
+
+      this.reparaciones = reparaciones;
+      console.log(this.dataDea)
+      this.deas = deas;
+
+      this.marcas = marcas;
     } catch (error) {
     } finally {
       this.loadingApp = false;
+      console.log(this.dataDea.data)
+      this.deas = this.dataDea.data;
     }
   },
   methods: {
@@ -232,8 +258,28 @@ export default {
         });
       } catch (error) {}
     },
-    async reparaciones(dea) {
-      const response = await this.$http(`/reparacion/dea/${dea}/`);
+    async getReparaciones(dea) {
+      try {
+        if ( !dea.reparaciones ) {
+          this.loadingApp = true;
+          const {
+            data: { data: reparaciones },
+          } = await this.$http(`/reparacion/dea/${dea.id}/`);
+          this.loadingApp = false;
+          dea.reparaciones = reparaciones;
+        } else {
+          delete dea.reparaciones
+        }
+      } catch (error) {}
+    },
+
+    async eliminarDea(dea) {
+      try {
+        this.loadingApp = true;
+        await this.$http.delete(`/deas/${this.$route.params.espacio}/${dea}/`);
+        this.loadingApp = false;
+
+      } catch (error) {}
     },
 
     async reparar(dea) {
@@ -252,11 +298,6 @@ export default {
         } = await this.$http(
           `/espacios_obligados/${this.$route.params.espacio}/`
         );
-
-        localStorage.setItem(
-          "espacio-obligado",
-          JSON.stringify(espacio_obligado)
-        );
       } catch (error) {
       } finally {
         this.loadingApp = false;
@@ -264,12 +305,12 @@ export default {
     },
   },
   watch: {
-    deaSeleccionado() {
-      if (this.deaSeleccionado) this.dialog = true;
-    },
-    dialog() {
-      if (!this.dialog) this.deaSeleccionado = null;
-    },
+    "dataDeas"() {
+      if (this.dataDea.data) {
+        deaStore().fetchDataDea(this.$route.params.espacio)
+        this.deas = this.dataDea.data;
+      }
+    }
   },
 };
 </script>

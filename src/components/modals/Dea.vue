@@ -29,7 +29,7 @@
                 v-model="dea.marca"
                 :items="marcas"
                 item-title="marca"
-                item-value="id"
+                return-object
                 variant="outlined"
                 density="compact"
                 persistent-placeholder=""
@@ -80,8 +80,11 @@
 <script>
 import axios from "axios";
 import alerts from "../../mixins/sweetalert";
+import { deaStore } from "../../stores/deas";
+import { mapWritableState } from "pinia";
+
 export default {
-  props: ["marcas", "deaSeleccionado"],
+  props: ["marcas"],
   mixins: [alerts],
   data() {
     return {
@@ -96,10 +99,8 @@ export default {
       modelos: [],
     };
   },
-  beforeMount() {
-    if (this.deaSeleccionado) {
-      this.dea = { ...this.dea, ...this.deaSeleccionado };
-    }
+  computed: {
+    ...mapWritableState(deaStore, ["dataDea"]),
   },
   methods: {
     async guardarDea() {
@@ -116,11 +117,11 @@ export default {
             data: { data: dea },
           } = await this.$http.post(`/deas/`, {
             ...this.dea,
-            ...{ marca: this.dea.marca.id },
+            ...{ marca: this.dea.marca.marca },
           });
-          this.loadingApp = false;
-          this.$emit("save");
-          this.alertSuccess("DEA", "Creado con éxito");
+          this.alertSuccess("Creado correctamente", "");
+          deaStore().fetchDataDea(this.$route.params.espacio)
+          this.$emit('close')
         }
       } catch (error) {
       } finally {

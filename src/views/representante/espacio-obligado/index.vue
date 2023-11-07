@@ -9,7 +9,6 @@
         :timeout="-1"
       >
         REPRESENTANDO: {{ espacioObligado.nombre }}
-
         <template v-slot:actions>
           <v-btn color="white" variant="text" @click="back()">
             <v-icon icon="mdi-close-circle-outline"></v-icon>

@@ -1,6 +1,6 @@
 <template>
   <v-row class="px-4">
-    <v-col cols="4" v-for="(space, i) in espacios" :key="i">
+    <v-col cols="12" md="4" v-for="(space, i) in espacios" :key="i">
       <v-card class="rounded-t-lg">
         <v-img
           width="100%"
