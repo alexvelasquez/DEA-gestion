@@ -1,4 +1,5 @@
 import Redireccion from "../views/Redireccion.vue";
+import ConfirmarSolicitud from "../views/ConfirmarSolicitud.vue";
 
 /** AUTH */
 import Auth from "../views/auth/index.vue";
@@ -32,6 +33,15 @@ const routes = [
     meta: {
       auth: false,
       title: "Home",
+    },
+  },
+  {
+    path: "/confirmar-solicitud/:solicitud",
+    name: "confirmar-solicitud",
+    component: ConfirmarSolicitud,
+    meta: {
+      auth: false,
+      title: "Confirmar Solicitud",
     },
   },
   {
