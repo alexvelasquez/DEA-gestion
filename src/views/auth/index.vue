@@ -48,7 +48,7 @@ export default {
       redirects: { 
         administrador_provincial: "/administrador-provincial",
         representante: "/representante",
-        certificador: "/certify-user"
+        certificador: "/usuario-certificante"
       },
       loginError: null
     };

@@ -7,13 +7,16 @@
       <v-row>
         <v-col cols="12">
           <v-text-field
+            class="mb-3"
             v-model="dea.nombre"
             label="Nombre"
             variant="outlined"
             density="compact"
             persistent-placeholder=""
+            :rules="stringRule"
           ></v-text-field>
           <v-text-field
+            class="mb-3"
             v-model="dea.numero_serie"
             label="Nro de serie"
             variant="outlined"
@@ -71,7 +74,7 @@
       <v-btn color="primary" variant="tonal" @click="$emit('close')"
         >CERRAR</v-btn
       >
-      <v-btn color="primary" variant="tonal" @click="guardarDea()"
+      <v-btn color="primary" variant="tonal" @click="guardarDea()" :disabled="disabledButton"
         >GUARDAR</v-btn
       >
     </v-card-actions>
@@ -80,7 +83,6 @@
 <script>
 import axios from "axios";
 import alerts from "../../mixins/sweetalert";
-import { deaStore } from "../../stores/deas";
 import { mapWritableState } from "pinia";
 
 export default {
@@ -93,14 +95,26 @@ export default {
         numero_serie: null,
         marca: null,
         modelo: null,
-        solidario: true,
+        solidario: null,
         espacio_obligado_id: this.$route.params.espacio,
       },
       modelos: [],
     };
   },
   computed: {
-    ...mapWritableState(deaStore, ["dataDea"]),
+    stringRule() {
+      return [
+        (value) => {
+          if (!/^[A-Za-z]+$/.test(value)) {
+            return "Ingrese solo letras";
+          }
+          return true;
+        },
+      ];
+    },
+    disabledButton(){
+      return !this.dea.nombre || !this.dea.numero_serie || !this.dea.marca || !this.dea.modelo || (this.dea.solidario === null);
+    }
   },
   methods: {
     async guardarDea() {
@@ -120,8 +134,8 @@ export default {
             ...{ marca: this.dea.marca.marca },
           });
           this.alertSuccess("Creado correctamente", "");
-          deaStore().fetchDataDea(this.$route.params.espacio)
-          this.$emit('close')
+          this.$emit('close');
+          this.$emit('save');
         }
       } catch (error) {
       } finally {

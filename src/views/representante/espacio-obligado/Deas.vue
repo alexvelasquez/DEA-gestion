@@ -19,10 +19,10 @@
       </v-row>
       <v-expansion-panels v-model="panels" multiple>
         <v-expansion-panel v-for="(dea, i) in deas" :key="i" class="">
-          <v-expansion-panel-title class="py-6 bg-tertiary" disable-icon-rotate>
+          <v-expansion-panel-title :class=" dea.activo ? 'bg-tertiary' : 'bg-orange-lighten-2'" class="py-6 text-white" disable-icon-rotate>
             {{ dea.nombre }}
             <template v-slot:actions>
-              <v-icon color="fifth" icon="mdi-check-decagram"> </v-icon>
+              <v-icon :color=" dea.activo ? 'fifth' : 'white' " icon="mdi-check-decagram"> </v-icon>
             </template>
           </v-expansion-panel-title>
           <v-expansion-panel-text>
@@ -119,32 +119,50 @@
                       <span class="text-caption font-weight-bold"
                         >REPARACIONES</span
                       >
-                      <p
+
+                      <v-chip
                         @click="getReparaciones(dea)"
-                        class="text-tertiary text-decoration-underline cursor-pointer text-caption"
+                        color="tertiary"
+                        size="small"
+                        class="ml-2"
+                        :prepend-icon="
+                          !dea.reparaciones ? 'mdi-eye-outline' : 'mdi-eye-off-outline'
+                        "
                       >
-                        ver
-                      </p>
+                      </v-chip>
                     </div>
                   </template>
                   <template v-slot:text>
-                    <p class="text-fifth text-caption" v-for="reparacion, i in dea.reparaciones" :key="i" >
-                      {{ reparacion.fecha_fin }}
-                    </p>
+                    <div
+                      class="text-fifth text-caption"
+                      v-for="(reparacion, i) in dea.reparaciones"
+                      :key="i"
+                    >
+                      <p>
+                        Fecha Reparacion:
+                        {{
+                          $moment(reparacion.fecha_fin).format("DD/MM/YYYY")
+                        }}
+                        Por: {{ reparacion.tecnico }}
+                      </p>
+                    </div>
                   </template>
                 </v-alert>
               </v-card-text>
               <v-card-actions class="px-4 justify-space-between">
                 <div>
                   <v-btn
-                    @click="reparar(dea.id)"
+                    @click="
+                      dea.activo ? desabilitar(dea) : (dialogReparacion = true)
+                    "
                     variant="flat"
                     class="px-4"
-                    color="warning"
-                    append-icon="mdi-cog-stop"
-                    >REPARAR</v-btn
+                    :color="dea.activo ? 'warning' : 'tertiary'"
+                    :append-icon="dea.activo ? 'mdi-cog-stop' : 'mdi-cog-play'"
+                    >{{ dea.activo ? "REPARAR" : "HABILITAR" }}</v-btn
                   >
                   <v-btn
+                    @click="mantenimientoDea(dea)"
                     variant="flat"
                     color="success"
                     class="px-4"
@@ -155,13 +173,25 @@
                 <v-btn
                   @click="eliminarDea(dea.id)"
                   variant="flat"
-                  color="tertiary"
+                  color="error"
                   class="px-4"
-                  append-icon="mdi-pencil"
+                  append-icon="mdi-delete"
                   >ELIMINAR</v-btn
                 >
               </v-card-actions>
             </v-card>
+            <v-dialog
+              v-model="dialogReparacion"
+              width="650"
+              z-index="1"
+              persistent
+            >
+              <ModalReparacion
+                @close="dialogReparacion = false"
+                :dea="dea"
+                @save="habilitar(dea)"
+              />
+            </v-dialog>
           </v-expansion-panel-text>
         </v-expansion-panel>
       </v-expansion-panels>
@@ -177,39 +207,40 @@
       >
     </div>
     <v-dialog v-model="dialog" width="650" z-index="1" persistent>
-      <ModalDea
-        @close="dialog = false"
-        :marcas="marcas"
-        @save="fetchDeas()"
-      />
+      <ModalDea @close="dialog = false" :marcas="marcas" @save="fetchDeas()" />
     </v-dialog>
+    <!-- <v-dialog v-model="dialogReparacion" width="650" z-index="1" persistent>
+      <ModalReparacion
+        @close="dialogReparacion = false"
+        :dea="dea"
+        @save="habilitar(dea)"
+      />
+    </v-dialog> -->
   </v-row>
 </template>
 <script>
 import axios from "axios";
 import ModalDea from "../../../components/modals/Dea.vue";
+import ModalReparacion from "../../../components/modals/Reparacion.vue";
 import alerts from "../../../mixins/sweetalert";
-import { deaStore } from "../../../stores/deas";
 import { mapWritableState } from "pinia";
 
 export default {
-  components: { ModalDea },
+  components: { ModalDea, ModalReparacion },
   mixins: [alerts],
   data() {
     return {
       panels: [0],
       panelsReparaciones: [],
       dialog: false,
+      dialogReparacion: false,
       marcas: [],
       deas: [],
     };
   },
-  computed: {
-    ...mapWritableState(deaStore, ["dataDea"]),
-  },
+  computed: {},
   async created() {
     try {
-      deaStore().fetchDataDea(this.$route.params.espacio)
       this.loadingApp = true;
       const { data: marcas } = await axios(
         "https://api.claudioraverta.com/deas/"
@@ -217,25 +248,15 @@ export default {
 
       this.marcas = marcas;
 
-      // await this.fetchDeas();
       const {
         data: { data: deas },
-      } = await this.$http(`/deass/${this.$route.params.espacio}`);
+      } = await this.$http(`/deas/${this.$route.params.espacio}/`);
 
-      const {
-        data: { data: reparaciones },
-      } = await this.$http(`/reparacion/dea/${this.$route.params.espacio}`);
-
-      this.reparaciones = reparaciones;
-      console.log(this.dataDea)
       this.deas = deas;
-
       this.marcas = marcas;
     } catch (error) {
     } finally {
       this.loadingApp = false;
-      console.log(this.dataDea.data)
-      this.deas = this.dataDea.data;
     }
   },
   methods: {
@@ -260,57 +281,103 @@ export default {
     },
     async getReparaciones(dea) {
       try {
-        if ( !dea.reparaciones ) {
+        if (!dea.reparaciones) {
           this.loadingApp = true;
           const {
             data: { data: reparaciones },
           } = await this.$http(`/reparacion/dea/${dea.id}/`);
+          if ( reparaciones.length === 0) {
+            this.alertError("No hay Reparaciones para mostrar, ");
+          }
+          console.log(reparaciones)
           this.loadingApp = false;
           dea.reparaciones = reparaciones;
         } else {
-          delete dea.reparaciones
+          delete dea.reparaciones;
         }
       } catch (error) {}
     },
 
     async eliminarDea(dea) {
       try {
-        this.loadingApp = true;
-        await this.$http.delete(`/deas/${this.$route.params.espacio}/${dea}/`);
-        this.loadingApp = false;
+        const { isConfirmed } = await this.alertQuestion(
+          "Eiminar DEA",
+          "¿Confirmar?"
+        );
 
+        if (isConfirmed) {
+          this.loadingApp = true;
+          await this.$http.delete(`/deas/${this.$route.params.espacio}/${dea}/`);
+          const {
+            data: { data: deas },
+          } = await this.$http(`/deas/${this.$route.params.espacio}/`);
+          this.deas = deas;
+          this.alertSuccess("DEA eliminado correctamente", "");
+          this.loadingApp = false;
+        }
       } catch (error) {}
     },
 
-    async reparar(dea) {
+    async desabilitar(dea) {
       try {
-        this.loadingApp = true;
-        const { data } = await this.$http.post(`/reparacion/dea/${dea}/`, {
-          fecha_inicio: new Date(),
-          fecha_fin: new Date(),
-          tecnico: "reparacion",
-        });
-        this.loadingApp = false;
-
-        this.alertSuccess("Dea en reparación");
-        var {
-          data: { data: espacio_obligado },
-        } = await this.$http(
-          `/espacios_obligados/${this.$route.params.espacio}/`
+        //logica desactivar
+        const { isConfirmed } = await this.alertQuestion(
+          "Reparar DEA",
+          "¿Confirmar?"
         );
+        if (isConfirmed) {
+          const params = {
+            activo: false,
+          };
+          await this.$http.post(`/activacion/dea/${dea.id}/?activo=false`);
+          // get deas
+          const {
+            data: { data: deas },
+          } = await this.$http(`/deas/${this.$route.params.espacio}/`);
+          this.deas = deas;
+          this.alertSuccess("Puesto en reparacion", "");
+        }
+      } catch (error) {}
+    },
+
+    async mantenimientoDea(dea) {
+      try {
+        //logica mantener dea
+        const { isConfirmed } = await this.alertQuestion(
+          "Mantener DEA",
+          "¿Confirmar?"
+        );
+        if (isConfirmed) {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+          await this.$http.post(`/mantenimiento/dea/${dea.id}/`);
+          const {
+            data: { data: deas },
+          } = await this.$http(`/deas/${this.$route.params.espacio}/`);
+          this.deas = deas;
+          this.alertSuccess("Mantenimiento correcto", "");
+        }
+      } catch (error) {}
+    },
+
+    async habilitar(dea) {
+      try {
+        //logica habilitar
+        this.loadingApp = true;
+        const { data } = await this.$http.post(
+          `/activacion/dea/${dea.id}/?activo=true`
+        );
+        // get deas
+        const {
+          data: { data: deas },
+        } = await this.$http(`/deas/${this.$route.params.espacio}/`);
+        this.deas = deas;
+        this.loadingApp = false;
       } catch (error) {
       } finally {
         this.loadingApp = false;
       }
     },
   },
-  watch: {
-    "dataDeas"() {
-      if (this.dataDea.data) {
-        deaStore().fetchDataDea(this.$route.params.espacio)
-        this.deas = this.dataDea.data;
-      }
-    }
-  },
+  watch: {},
 };
 </script>

@@ -158,6 +158,7 @@
             variant="outlined"
             density="compact"
             label="CUIT"
+            :rules="numberRule"
           ></v-text-field>
           <v-text-field
             v-model="nuevaEntidad.razon_social"
@@ -221,6 +222,7 @@
             density="compact"
             label="Número de sede"
             persistent-placeholder
+            :rules="numberRule"
           ></v-text-field>
         </v-card-text>
         <v-divider></v-divider>
@@ -317,6 +319,26 @@ export default {
   computed: {
     sedes() {
       return this.entidad ? this.entidad.sedes || [] : [];
+    },
+    numberRule() {
+      return [
+        (value) => {
+          if (!/^\d+$/.test(value)) {
+            return "Ingrese solo números";
+          }
+          return true;
+        },
+      ];
+    },
+    stringRule() {
+      return [
+        (value) => {
+          if (!/^[A-Za-z]+$/.test(value)) {
+            return "Ingrese solo letras";
+          }
+          return true;
+        },
+      ];
     },
   },
   methods: {

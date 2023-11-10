@@ -10,6 +10,9 @@ import Axios from "./plugins/axios";
 import VueSweetalert2 from "vue-sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 
+import VueDatePicker from "@vuepic/vue-datepicker";
+import "@vuepic/vue-datepicker/dist/main.css";
+
 import "./assets/custom.css";
 
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
@@ -25,6 +28,7 @@ const app = createApp(App)
   .use(vuetify)
   .use(pinia)
   .use(VueSweetalert2)
+  .use(VueDatePicker)
   .mixin(GlobalMixin);
 app.config.globalProperties.$http = Axios;
 app.config.globalProperties.$moment = moment;

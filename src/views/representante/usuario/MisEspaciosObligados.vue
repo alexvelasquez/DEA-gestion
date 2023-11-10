@@ -58,7 +58,7 @@ export default {
           color: "warning",
           nombre: "EN PROCESO DE SER CADIO-ASISTIDO",
         },
-        DDJJ: {
+        "Cardio-Asistido con DDJJ": {
           icon: "mdi-draw",
           color: "primary",
           nombre: "CARDIO-ASISTIDO CON DDJJ",
