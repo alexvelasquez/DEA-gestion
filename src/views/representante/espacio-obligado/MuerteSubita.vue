@@ -61,7 +61,7 @@
                 </div>
               </template>
               <template v-slot:append>
-                <div v-if="persona.incoveniente">
+                <div v-if="persona.incovenientes && persona.incovenientes.length">
                   <v-btn
                   @click="dialogInconveniente = true; personaIdLocal=persona"
                   class="mr-2"
