@@ -85,6 +85,7 @@ import { mapWritableState } from "pinia";
 import moment from "moment";
 
 export default {
+  props: ["muerteSubita"],
   mixins: [alerts],
   data() {
     return {
@@ -95,6 +96,7 @@ export default {
         respondio_con_descargas_electricas: null,
         cantidad_de_descargas: null,
         extra_info: null,
+        responsable_id: this.muerteSubita.responsable_id
       },
     };
   },
@@ -110,7 +112,8 @@ export default {
       ];
     },
   },
-  async created() {},
+  async created() {
+  },
   methods: {
     async guardarMuerte() {
       try {
@@ -119,7 +122,9 @@ export default {
           "¿Confirmar?"
         );
         if (isConfirmed) {
+          const { data } = await this.$http.post(`/inconvenientes/${this.$route.params.espacio}/${this.muerteSubita.id}/`, this.inconveniente);
           this.alertSuccess("Cargado correctamente", "");
+          this.emmit("close")
         }
       } catch (error) {
         this.alertError("No se pudo cargar", "");

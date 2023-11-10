@@ -77,7 +77,7 @@
                     <span class="text-caption font-weight-bold">MARCA</span>
                   </template>
                   <p class="text-fifth text-caption">
-                    {{ dea.marca ? dea.marca.marca : null }}
+                    {{ dea.marca ? dea.marca : null }}
                   </p>
                 </v-alert>
                 <v-alert

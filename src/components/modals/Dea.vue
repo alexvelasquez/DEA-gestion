@@ -105,7 +105,7 @@ export default {
     stringRule() {
       return [
         (value) => {
-          if (!/^[A-Za-z]+$/.test(value)) {
+          if (!/^[A-Za-z\s]+$/.test(value)) {
             return "Ingrese solo letras";
           }
           return true;

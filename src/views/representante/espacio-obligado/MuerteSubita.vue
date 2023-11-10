@@ -10,8 +10,17 @@
             color="primary"
             size="large"
             variant="elevated"
-            >NUEVO</v-btn
+            :disabled="
+              this.espacioObligado.estado != 'Cardio-Asistido con DDJJ'
+            "
+            >NUEVO
+            </v-btn
           >
+          <v-tooltip 
+            activator="parent" 
+            v-if="this.espacioObligado.estado != 'Cardio-Asistido con DDJJ'"
+              >Complete DDJJ y valide DEAS</v-tooltip
+            >
         </v-col>
       </v-row>
       <v-alert class="text-fourth" border="start" border-color="fourth">
@@ -28,27 +37,48 @@
             <v-divider v-if="i == 0"></v-divider>
             <v-list-item>
               <template v-slot:prepend>
-                <v-avatar color="primary">
-                </v-avatar>
-               </template>
+                <v-avatar color="primary"> </v-avatar>
+              </template>
               <template v-slot:title>
                 {{ persona.sexo }}
               </template>
               <template v-slot:subtitle>
                 <div>
-                  <p class="text-primary">Fallecio: {{ persona.fallecio ? 'Si' : 'No'}}</p>
+                  <p class="text-primary">
+                    Fallecio: {{ persona.fallecio ? "Si" : "No" }}
+                  </p>
                   <p>Edad: {{ persona.edad }}</p>
-                  <p>Se Practico Rcp: {{ persona.rcp ? 'si' : 'no' }}</p>
+                  <p>Se Practico Rcp: {{ persona.rcp ? "si" : "no" }}</p>
+                </div>
+              </template>
+              <template >
+                <div>
+                  <p class="text-primary">
+                    Fallecio: {{ persona.fallecio ? "Si" : "No" }}
+                  </p>
+                  <p>Edad: {{ persona.edad }}</p>
+                  <p>Se Practico Rcp: {{ persona.rcp ? "si" : "no" }}</p>
                 </div>
               </template>
               <template v-slot:append>
-                <v-btn
-                  @click="dialogInconveniente = true"
+                <div v-if="persona.incoveniente">
+                  <v-btn
+                  @click="dialogInconveniente = true; personaIdLocal=persona"
                   class="mr-2"
                   color="primary"
                   variant="tonal"
                   >AGREGAR INCONVENIENTE</v-btn
                 >
+                </div>
+                <div v-else>
+                  <p class="text-primary">
+                    Cantidad de descargas:{{ persona.incovenientes[0].id }}
+                  </p>
+                  <p>equipo estaba en sitio: {{ persona.incovenientes[0].estaba_en_sitio }}</p>
+                  <p>Falto insumos: {{ persona.incovenientes[0].falta_insumos ? "si" : "no" }}</p>
+                </div>
+
+                
               </template>
             </v-list-item>
             <v-divider></v-divider>
@@ -56,11 +86,18 @@
         </v-list>
       </v-card>
     </v-col>
-    <v-dialog v-model="dialog" width="650" z-index="1" persistent>
-      <ModalMuerteSubita @close="dialog = false" @save="fetchMuertesSubitas()" />
-    </v-dialog>
     <v-dialog v-model="dialogInconveniente" width="650" z-index="1" persistent>
-      <ModalInconveniente @close="dialogInconveniente = false" @save="fetchMuertesSubitas()" />
+      <ModalInconveniente
+        @close="dialogInconveniente = false"
+        :muerteSubita="personaIdLocal"
+        @save="fetchMuertesSubitas()"
+      />
+    </v-dialog>
+    <v-dialog v-model="dialog" width="650" z-index="1" persistent >
+      <ModalMuerteSubita
+        @close="dialog = false"
+        @save="fetchMuertesSubitas()"
+      />
     </v-dialog>
   </v-row>
 </template>
@@ -77,10 +114,11 @@ export default {
       dialog: false,
       dialogInconveniente: false,
       dataMuertes: null,
+      personaIdLocal: null,
       muertesSubitas: [
         {
-          fecha: '2023-11-08T03:33:29.657Z',
-          sexo: 'Femenino',
+          fecha: "2023-11-08T03:33:29.657Z",
+          sexo: "Femenino",
           edad: 23,
           fallecio: false,
           rcp: true,
@@ -88,8 +126,8 @@ export default {
           responsable_id: 4,
         },
         {
-          fecha: '2023-11-08T03:33:29.657Z',
-          sexo: 'Masculino',
+          fecha: "2023-11-08T03:33:29.657Z",
+          sexo: "Masculino",
           edad: 30,
           fallecio: true,
           rcp: true,
@@ -107,7 +145,7 @@ export default {
       //   data: { data: solicitudes },
       // } = await this.fetchMuertesSubitas();
       // this.dataMuertes = solicitudes;
-      this.fetchMuertesSubitas()
+      this.fetchMuertesSubitas();
     } catch (error) {
     } finally {
       this.loadingApp = false;
@@ -116,10 +154,10 @@ export default {
   methods: {
     async fetchMuertesSubitas() {
       const {
-        data: { data: solicitudes }
+        data: { data: solicitudes },
       } = await this.$http(`/muerte-subita/${this.$route.params.espacio}/`);
       this.dataMuertes = solicitudes;
     },
-  }
+  },
 };
 </script>

@@ -147,7 +147,9 @@ export default {
             `/muerte-subita/${this.$route.params.espacio}/`,
             muerte
           );
-          this.alertSucess("Exito", "");
+          this.alertSuccess("Exito", "");
+          this.$emit("save");
+          this.$emit("close");
         }
       } catch (error) {
         this.alertError("No se pudo cargar", "");

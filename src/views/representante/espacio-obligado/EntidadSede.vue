@@ -123,11 +123,12 @@
             <v-col cols="12" md="3" class="mt-md-n5">
               <v-text-field
                 v-model="sede.superficie"
-                label="Superficie (*)"
+                label="Superficie (*) m2"
                 placeholder="54 mt2"
                 variant="outlined"
                 density="compact"
                 persistent-placeholder
+                :rules="numberRule"
               >
               </v-text-field>
             </v-col>
@@ -139,6 +140,7 @@
                 variant="outlined"
                 density="compact"
                 persistent-placeholder
+                :rules="numberRule"
               >
               </v-text-field>
             </v-col>
@@ -150,6 +152,7 @@
                 variant="outlined"
                 density="compact"
                 persistent-placeholder
+                :rules="numberRule"
               >
               </v-text-field>
             </v-col>
@@ -161,6 +164,7 @@
                 variant="outlined"
                 density="compact"
                 persistent-placeholder
+                :rules="numberRule"
               >
               </v-text-field>
             </v-col>
@@ -220,6 +224,7 @@
                 variant="outlined"
                 density="compact"
                 persistent-placeholder
+                :rules="emailRule"
               >
               </v-text-field>
             </v-col>
@@ -279,6 +284,37 @@ export default {
   },
   computed: {
     ...mapState(useEspacioStore, ["menuValidacionDEA"]),
+    stringRule() {
+      return [
+        (value) => {
+          if (!/^[A-Za-z\s]$/.test(value)) {
+            return "Ingrese solo letras";
+          }
+          return true;
+        },
+      ];
+    },
+    emailRule() {
+      return [
+        (value) => {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(value)) {
+            return "Ingrese una dirección de correo electrónico válida";
+          }
+          return true;
+        },
+      ];
+    },
+    numberRule() {
+      return [
+        (value) => {
+          if (!/^\d+$/.test(value)) {
+            return "Ingrese solo números";
+          }
+          return true;
+        },
+      ];
+    },
   },
   async created() {
     try {

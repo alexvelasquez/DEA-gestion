@@ -19,7 +19,18 @@
           <strong> FECHA INICO - FECHA FIN </strong>
         </v-card-text>
         <v-col cols="12">
-          <VueDatePicker v-model="date" range multi-calendars></VueDatePicker>
+          <v-row>
+            <v-col cols="6">
+              <VueDatePicker
+                v-model="date"
+                range
+                :enable-time-picker="false"
+                :max-date="maxDate"
+                prevent-min-max-navigation
+                teleport-center
+              ></VueDatePicker>
+            </v-col>
+          </v-row>
         </v-col>
       </v-row>
       <v-row>
@@ -27,37 +38,12 @@
       </v-row>
       <v-row>
         <v-col cols="12" md="6">
-          <v-card-text height="10" class="text-fourth" border="start" border-color="fourth">
-            <strong> TECNICO </strong>
-          </v-card-text>
-          <v-text-field
-            label="Tecnico"
-            v-model="tecnico"
-            item-title="Tecnico"
-            return-object
-            variant="outlined"
-            density="compact"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="12" md="6">
-          <v-card-text height="10" class="text-fourth" border="start" border-color="fourth">
-            <strong> TECNICO </strong>
-          </v-card-text>
-          <v-text-field
-            label="Tecnico"
-            v-model="tecnico"
-            item-title="Tecnico"
-            return-object
-            variant="outlined"
-            density="compact"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="12" md="6">
-          <v-card-text height="10" class="text-fourth" border="start" border-color="fourth">
+          <v-card-text
+            height="10"
+            class="text-fourth"
+            border="start"
+            border-color="fourth"
+          >
             <strong> TECNICO </strong>
           </v-card-text>
           <v-text-field
@@ -99,7 +85,9 @@ export default {
         .toISOString()
         .substr(0, 10),
       date: null,
-      tecnico: '',
+      tecnico: "",
+
+      maxDate: new Date(Date.now()),
     };
   },
   computed: {},
@@ -111,8 +99,12 @@ export default {
           "¿Confirmar?"
         );
         if (isConfirmed) {
-          const fechaInicio= moment(this.date[0]).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
-          const fechaFin= moment(this.date[1]).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+          const fechaInicio = moment(this.date[0]).format(
+            "YYYY-MM-DDTHH:mm:ss.SSS[Z]"
+          );
+          const fechaFin = moment(this.date[1]).format(
+            "YYYY-MM-DDTHH:mm:ss.SSS[Z]"
+          );
 
           this.loadingApp = true;
           const params = {
@@ -120,12 +112,14 @@ export default {
             fecha_fin: fechaFin,
             tecnico: this.tecnico,
           };
-          const { data } = await this.$http.post(`/reparacion/dea/${this.dea.id}/`, params);
-
+          const { data } = await this.$http.post(
+            `/reparacion/dea/${this.dea.id}/`,
+            params
+          );
 
           this.alertSuccess("Reparacion Guardada correctamente", "");
-          this.$emit('close');
-          this.$emit('save');
+          this.$emit("close");
+          this.$emit("save");
         }
       } catch (error) {
       } finally {
