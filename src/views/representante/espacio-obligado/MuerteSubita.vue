@@ -94,14 +94,20 @@
         </v-row>
       </v-col>
     </v-row>
-    <div v-else class="d-flex flex-column justify-center align-center" style="width:100%">
+    <div
+      v-else
+      class="d-flex flex-column justify-center align-center"
+      style="width: 100%"
+    >
       <v-icon
         color="grey-lighten-2"
         icon="mdi-text-box-search-outline"
         size="200"
       ></v-icon>
       <v-btn @click="dialog = true" variant="tonal" color="primary"
-        >NUEVA MUERTE SUBITA</v-btn
+        :disabled="this.espacioObligado.estado != 'Cardio-Asistido con DDJJ'"
+        >NUEVA MUERTE SUBITA
+        </v-btn
       >
     </div>
     <v-dialog v-model="dialogInconveniente" width="650" z-index="1" persistent>

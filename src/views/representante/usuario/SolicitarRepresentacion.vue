@@ -449,7 +449,7 @@ export default {
             const {
               data: { data: espacio },
             } = await this.$http.get(
-              `/espacios_obligados/?sede=${this.sede.id}/`
+              `/espacios_obligados/?sede=${this.sede.id}`
             );
             this.espacioObligado = espacio;
           } else {

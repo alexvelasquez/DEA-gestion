@@ -158,18 +158,3 @@ export default {
   },
 };
 </script>
-const { isConfirmed } = await this.alertQuestion(
-          "Guardar Muerte Subita",
-          "¿Confirmar?"
-        );
-        if (isConfirmed) {
-          this.loadingApp = true;
-          // const local = new Date(Date.now()) 
-          // this.muerteSubitaDatos.fecha = moment(local).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
-          // this.muerteSubitaDatos.responsable_id = this.user.id;
-          console.log("hola entramos")
-          // const { data } = await this.$http.post(`/muerte-subita/${this.$route.params.espacio}/`, muerteSubitaDatos);
-          this.alertSuccess("Cargado correctamente", "");
-          this.$emit('close');
-          this.$emit('save');
-        }
