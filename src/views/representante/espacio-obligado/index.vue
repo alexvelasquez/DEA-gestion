@@ -1,22 +1,22 @@
 <template>
   <div>
-    <div class="text-center" v-if="espacioObligado">
-      <v-snackbar
-        location="top center"
-        color="primary"
-        style="top: 30px"
-        v-model="snackbar"
-        :timeout="-1"
-      >
-        REPRESENTANDO: {{ espacioObligado.nombre }}
-        <template v-slot:actions>
-          <v-btn color="white" variant="text" @click="back()">
-            <v-icon icon="mdi-close-circle-outline"></v-icon>
-          </v-btn>
-        </template>
-      </v-snackbar>
-    </div>
-    <v-container class="pa-15">
+    <v-container class="py-15">
+      <div class="d-flex justify-center text-center" v-if="espacioObligado">
+        <v-snackbar
+          location="top end"
+          color="primary"
+          style="top: 30px"
+          v-model="snackbar"
+          :timeout="-1"
+        >
+          REPRESENTANDO: {{ espacioObligado.nombre }}
+          <template v-slot:actions>
+            <v-btn color="white" variant="text" @click="back()">
+              <v-icon icon="mdi-close-circle-outline"></v-icon>
+            </v-btn>
+          </template>
+        </v-snackbar>
+      </div>
       <router-view></router-view>
     </v-container>
   </div>

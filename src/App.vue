@@ -1,6 +1,10 @@
 <template>
   <v-layout class="rounded rounded-md">
-    <v-overlay persistent :model-value="loadingApp" class="align-center justify-center">
+    <v-overlay
+      persistent
+      :model-value="loadingApp"
+      class="align-center justify-center"
+    >
       <v-progress-circular
         color="primary"
         indeterminate
@@ -12,7 +16,7 @@
       permanent
       location="left"
       width="256"
-      v-if="$route.meta.auth"
+      v-if="user && $route.meta.auth"
     >
       <template v-slot:prepend>
         <v-list-item lines="two" class="bg-fourth" v-if="user">
@@ -26,7 +30,7 @@
               user.email
             }}</v-list-item-title>
             <v-list-item-subtitle>
-              <p>{{ rol}}</p>
+              <p>{{ rol }}</p>
               <p @click="logout()" class="mt-2 cursor-pointer">
                 <v-icon size="x-small" icon="mdi-logout"></v-icon>
                 Cerrar Sesión
@@ -68,14 +72,13 @@
       </v-list>
     </v-navigation-drawer>
     <v-main
-    
       class="d-flex align-center justify-center"
       style="min-height: 100vh"
     >
       <v-container v-if="$route.meta.auth">
         <v-system-bar
           class="py-4 mr-4"
-          style="width: calc((100% - 256px) - 0px); left: 256px; z-index:1"
+          style="width: calc((100% - 256px) - 0px); left: 256px; z-index: 1"
         >
           <span class="font-weight-bold px-4">{{ $route.meta.title }}</span>
           <v-spacer></v-spacer>
@@ -93,7 +96,7 @@
   </v-layout>
 </template>
 <script>
-import { useAppStore } from './stores/app.js';
+import { useAppStore } from "./stores/app.js";
 
 export default {
   data() {
@@ -104,8 +107,6 @@ export default {
   methods: {
     logout() {
       useAppStore().logOut();
-      localStorage.removeItem("token");
-      this.user = null;
       this.$router.push("/");
     },
   },
@@ -115,7 +116,7 @@ export default {
 .menu-user .v-list-item__prepend {
   display: block !important;
 }
-.menu-user{
+.menu-user {
   z-index: 1 !important;
 }
 </style>

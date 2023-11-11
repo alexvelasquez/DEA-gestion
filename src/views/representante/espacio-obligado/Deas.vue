@@ -1,8 +1,5 @@
 <template>
-  <v-row
-    class="mt-2"
-    style="min-height: 70vh; justify-content: center; align-items: center"
-  >
+  <v-row v-if="!loadingApp" class="mt-2" style="min-height: 70vh">
     <v-col cols="12" v-if="deas.length">
       <v-row class="mb-4">
         <v-col cols="12" md="10"> </v-col>
@@ -19,10 +16,24 @@
       </v-row>
       <v-expansion-panels v-model="panels" multiple>
         <v-expansion-panel v-for="(dea, i) in deas" :key="i" class="">
-          <v-expansion-panel-title :class=" dea.activo ? 'bg-tertiary' : 'bg-orange-lighten-2'" class="py-6 text-white" disable-icon-rotate>
+          <v-expansion-panel-title
+            :class="dea.activo ? 'bg-tertiary' : 'bg-red-lighten-2'"
+            class="py-6 text-white"
+            disable-icon-rotate
+          >
             {{ dea.nombre }}
             <template v-slot:actions>
-              <v-icon :color=" dea.activo ? 'fifth' : 'white' " icon="mdi-check-decagram"> </v-icon>
+              <v-chip
+                size="small"
+                class="ml-2"
+                :prepend-icon="
+                  dea.activo
+                    ? 'mdi-check-decagram'
+                    : 'mdi-alert-decagram-outline'
+                "
+              >
+                {{ dea.activo ? "Activo" : " Inactivo" }}
+              </v-chip>
             </template>
           </v-expansion-panel-title>
           <v-expansion-panel-text>
@@ -30,7 +41,7 @@
               <v-card-text>
                 <v-row no-gutters justify="end">
                   <v-chip
-                    color="info"
+                    color="primary"
                     size="small"
                     prepend-icon="mdi-update"
                     v-if="dea.fecha_ultimo_mantenimiento"
@@ -38,21 +49,9 @@
                     Fecha Actualización:
                     {{
                       $moment(dea.fecha_ultimo_mantenimiento).format(
-                        "DD/MM/YYYY"
+                        "DD/MM/YYYY HH:mm"
                       )
                     }}
-                  </v-chip>
-                  <v-chip
-                    :color="dea.activo ? 'success' : 'error'"
-                    size="small"
-                    class="ml-2"
-                    :prepend-icon="
-                      dea.activo
-                        ? 'mdi-check-decagram'
-                        : 'mdi-alert-decagram-outline'
-                    "
-                  >
-                    {{ dea.activo ? "Activo" : " Inactivo" }}
                   </v-chip>
                   <v-chip
                     :prepend-icon="
@@ -120,31 +119,38 @@
                         >REPARACIONES</span
                       >
 
-                      <v-chip
+                      <v-icon
                         @click="getReparaciones(dea)"
                         color="tertiary"
                         size="small"
                         class="ml-2"
-                        :prepend-icon="
-                          !dea.reparaciones ? 'mdi-eye-outline' : 'mdi-eye-off-outline'
+                        :icon="
+                          !dea.reparaciones
+                            ? 'mdi-eye-outline'
+                            : 'mdi-eye-off-outline'
                         "
-                      >
-                      </v-chip>
+                      />
                     </div>
                   </template>
                   <template v-slot:text>
-                    <div
-                      class="text-fifth text-caption"
-                      v-for="(reparacion, i) in dea.reparaciones"
-                      :key="i"
-                    >
-                      <p>
-                        Fecha Reparacion:
-                        {{
-                          $moment(reparacion.fecha_fin).format("DD/MM/YYYY")
-                        }}
-                        Por: {{ reparacion.tecnico }}
-                      </p>
+                    <v-skeleton-loader
+                      v-if="dea.loadingReparaciones"
+                      type="list-item-two-line"
+                    ></v-skeleton-loader>
+                    <div v-else>
+                      <div
+                        class="text-fifth text-caption"
+                        v-for="(reparacion, i) in dea.reparaciones"
+                        :key="i"
+                      >
+                        <p>
+                          Fecha Reparacion:
+                          {{
+                            $moment(reparacion.fecha_fin).format("DD/MM/YYYY")
+                          }}
+                          Por: {{ reparacion.tecnico }}
+                        </p>
+                      </div>
                     </div>
                   </template>
                 </v-alert>
@@ -196,26 +202,40 @@
         </v-expansion-panel>
       </v-expansion-panels>
     </v-col>
-    <div v-else class="d-flex flex-column justify-center align-center">
+    <div
+      v-else-if="deas.length === 0"
+      class="d-flex flex-column justify-center align-center"
+    >
       <v-icon
         color="grey-lighten-2"
         icon="mdi-text-box-search-outline"
         size="200"
       ></v-icon>
-      <v-btn @click="dialog = true" variant="text" color="primary"
-        >CREAR DEA</v-btn
+      <v-btn @click="dialog = true" variant="tonal" color="primary"
+        >CREAR NUEVO DEA</v-btn
       >
     </div>
     <v-dialog v-model="dialog" width="650" z-index="1" persistent>
       <ModalDea @close="dialog = false" :marcas="marcas" @save="fetchDeas()" />
     </v-dialog>
-    <!-- <v-dialog v-model="dialogReparacion" width="650" z-index="1" persistent>
-      <ModalReparacion
-        @close="dialogReparacion = false"
-        :dea="dea"
-        @save="habilitar(dea)"
-      />
-    </v-dialog> -->
+    <v-overlay
+      :model-value="enMantenimiento"
+      class="align-center justify-center"
+    >
+      <v-row>
+        <v-col class="text-body-2 text-center" cols="12">
+          <p class="font-weight-bold text-fourth">REALIZANDO MANTENIMIENTO</p>
+        </v-col>
+        <v-col cols="12" class="text-center">
+          <v-progress-linear
+            color="primary"
+            indeterminate
+            rounded
+            height="6"
+          ></v-progress-linear>
+        </v-col>
+      </v-row>
+    </v-overlay>
   </v-row>
 </template>
 <script>
@@ -234,6 +254,8 @@ export default {
       panelsReparaciones: [],
       dialog: false,
       dialogReparacion: false,
+      loadingReparaciones: false,
+      enMantenimiento: false,
       marcas: [],
       deas: [],
     };
@@ -282,20 +304,25 @@ export default {
     async getReparaciones(dea) {
       try {
         if (!dea.reparaciones) {
-          this.loadingApp = true;
+          dea.loadingReparaciones = true;
           const {
             data: { data: reparaciones },
           } = await this.$http(`/reparacion/dea/${dea.id}/`);
-          if ( reparaciones.length === 0) {
-            this.alertError("No hay Reparaciones para mostrar, ");
+          if (reparaciones.length) {
+            dea.reparaciones = reparaciones;
+          } else {
+            delete dea.reparaciones;
+            this.$nextTick(() => {
+              this.alertWarning("No hay Reparaciones para mostrar.");
+            });
           }
-          console.log(reparaciones)
-          this.loadingApp = false;
-          dea.reparaciones = reparaciones;
         } else {
           delete dea.reparaciones;
         }
-      } catch (error) {}
+      } catch (error) {
+      } finally {
+        dea.loadingReparaciones = false;
+      }
     },
 
     async eliminarDea(dea) {
@@ -307,11 +334,14 @@ export default {
 
         if (isConfirmed) {
           this.loadingApp = true;
-          await this.$http.delete(`/deas/${this.$route.params.espacio}/${dea}/`);
+          await this.$http.delete(
+            `/deas/${this.$route.params.espacio}/${dea}/`
+          );
           const {
             data: { data: deas },
           } = await this.$http(`/deas/${this.$route.params.espacio}/`);
           this.deas = deas;
+          this.updateEspacioObligado(this.$route.params.espacio);
           this.alertSuccess("DEA eliminado correctamente", "");
           this.loadingApp = false;
         }
@@ -348,12 +378,14 @@ export default {
           "¿Confirmar?"
         );
         if (isConfirmed) {
+          this.enMantenimiento = true;
           await new Promise((resolve) => setTimeout(resolve, 2000));
           await this.$http.post(`/mantenimiento/dea/${dea.id}/`);
           const {
             data: { data: deas },
           } = await this.$http(`/deas/${this.$route.params.espacio}/`);
           this.deas = deas;
+          this.enMantenimiento = false;
           this.alertSuccess("Mantenimiento correcto", "");
         }
       } catch (error) {}

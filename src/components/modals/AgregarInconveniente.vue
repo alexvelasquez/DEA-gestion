@@ -78,12 +78,7 @@
   </v-row>
 </template>
 <script>
-import axios from "axios";
 import alerts from "../../mixins/sweetalert";
-import { espaciosObligadosStore } from "../../stores/espacioObligado";
-import { mapWritableState } from "pinia";
-import moment from "moment";
-
 export default {
   props: ["muerteSubita"],
   mixins: [alerts],

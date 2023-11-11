@@ -74,7 +74,11 @@
       <v-btn color="primary" variant="tonal" @click="$emit('close')"
         >CERRAR</v-btn
       >
-      <v-btn color="primary" variant="tonal" @click="guardarDea()" :disabled="disabledButton"
+      <v-btn
+        color="primary"
+        variant="tonal"
+        @click="guardarDea()"
+        :disabled="disabledButton"
         >GUARDAR</v-btn
       >
     </v-card-actions>
@@ -83,7 +87,6 @@
 <script>
 import axios from "axios";
 import alerts from "../../mixins/sweetalert";
-import { mapWritableState } from "pinia";
 
 export default {
   props: ["marcas"],
@@ -112,9 +115,15 @@ export default {
         },
       ];
     },
-    disabledButton(){
-      return !this.dea.nombre || !this.dea.numero_serie || !this.dea.marca || !this.dea.modelo || (this.dea.solidario === null);
-    }
+    disabledButton() {
+      return (
+        !this.dea.nombre ||
+        !this.dea.numero_serie ||
+        !this.dea.marca ||
+        !this.dea.modelo ||
+        this.dea.solidario === null
+      );
+    },
   },
   methods: {
     async guardarDea() {
@@ -133,9 +142,11 @@ export default {
             ...this.dea,
             ...{ marca: this.dea.marca.marca },
           });
+          // Actualizo el espacio obligado para actualizar el estado del espacio
+          await this.updateEspacioObligado(this.$route.params.espacio);
           this.alertSuccess("Creado correctamente", "");
-          this.$emit('close');
-          this.$emit('save');
+          this.$emit("close");
+          this.$emit("save");
         }
       } catch (error) {
       } finally {

@@ -279,6 +279,7 @@ export default {
       provincias: [],
       sede: {
         entidad: {},
+        sector: "publico",
       },
     };
   },
@@ -318,11 +319,8 @@ export default {
   },
   async created() {
     try {
-      await this.updateEspacioObligado(this.$route.params.espacio);
+      await this.fetchSedes();
 
-      const { sede } = this.espacioObligado;
-      this.sede = { ...sede };
-      this.sede.sector = this.sede.sector ? this.sede.sector : "publico";
       const {
         data: { data: provincias },
       } = await this.$http("/provincias/");
@@ -330,7 +328,7 @@ export default {
 
       const {
         data: { data: responsables },
-      } = await this.$http(`/responsables/${sede.id}/`);
+      } = await this.$http(`/responsables/${this.sede.id}/`);
       this.responsables = responsables;
     } catch (error) {
       console.log(error);
@@ -375,10 +373,19 @@ export default {
             "SEDE",
             "Cambios realizados."
           );
-          if (isConfirmed) {
-            await this.updateEspacioObligado(this.$route.params.espacio);
-          }
+          // Actualizo el espacio obligado, para evaluar si cumplo con las condiciones para cargar un DEA
+          await this.updateEspacioObligado(this.$route.params.espacio);
         }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async fetchSedes() {
+      try {
+        const {
+          data: { data: sede },
+        } = await this.$http.get(`/sedes/${this.$route.params.espacio}/`);
+        this.sede = { ...sede };
       } catch (error) {
         console.log(error);
       }

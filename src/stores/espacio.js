@@ -47,6 +47,12 @@ export const useEspacioStore = defineStore('espacio', {
             },]
         },
     },
+    persist: [
+        {
+            paths: ["espacioObligado"],
+            storage: localStorage,
+        },
+    ],
     actions: {
         async updateEspacioObligado(espacio) {
             try {

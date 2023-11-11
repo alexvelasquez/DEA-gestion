@@ -28,6 +28,7 @@ export const useAppStore = defineStore("app", {
   ],
   actions: {
     logOut() {
+      localStorage.removeItem("token");
       this.user = null;
     },
   },

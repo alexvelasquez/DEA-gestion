@@ -82,10 +82,7 @@
   </v-row>
 </template>
 <script>
-import axios from "axios";
 import alerts from "../../mixins/sweetalert";
-import { espaciosObligadosStore } from "../../stores/espacioObligado";
-import { mapWritableState } from "pinia";
 import { useAppStore } from "../../stores/app";
 import moment from "moment";
 
@@ -137,7 +134,7 @@ export default {
     async guardarMuerte(muerte) {
       try {
         const { isConfirmed } = await this.alertQuestion(
-          "Guardar nueva Muerte subita",
+          "Guardar muerte súbita",
           "¿Confirmar?"
         );
         if (isConfirmed) {
@@ -147,7 +144,7 @@ export default {
             `/muerte-subita/${this.$route.params.espacio}/`,
             muerte
           );
-          this.alertSuccess("Exito", "");
+          this.alertSuccess("Guarda", "");
           this.$emit("save");
           this.$emit("close");
         }

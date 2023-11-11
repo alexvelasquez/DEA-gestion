@@ -6,21 +6,14 @@
       border="start"
       border-color="fourth"
     >
-      <strong> NUEVO REPARACION </strong>
+      <strong> DETALLE DE REPARACIÓN </strong>
     </v-alert>
     <v-card-text class="mt-4">
       <v-row>
-        <v-card-text
-          height="10"
-          class="text-fourth"
-          border="start"
-          border-color="fourth"
-        >
-          <strong> FECHA INICO - FECHA FIN </strong>
-        </v-card-text>
         <v-col cols="12">
           <v-row>
             <v-col cols="6">
+              <span class="text-caption">FECHA DE INICIO - FECHA DE FIN</span>
               <VueDatePicker
                 v-model="date"
                 range
@@ -30,30 +23,16 @@
                 teleport-center
               ></VueDatePicker>
             </v-col>
+            <v-col cols="12" md="6">
+              <span class="text-caption">TÉCNICO</span>
+              <v-text-field
+                v-model="tecnico"
+                persistent-placeholder
+                variant="outlined"
+                density="compact"
+              ></v-text-field>
+            </v-col>
           </v-row>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col> </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="12" md="6">
-          <v-card-text
-            height="10"
-            class="text-fourth"
-            border="start"
-            border-color="fourth"
-          >
-            <strong> TECNICO </strong>
-          </v-card-text>
-          <v-text-field
-            label="Tecnico"
-            v-model="tecnico"
-            item-title="Tecnico"
-            return-object
-            variant="outlined"
-            density="compact"
-          ></v-text-field>
         </v-col>
       </v-row>
     </v-card-text>
@@ -69,7 +48,6 @@
   </v-card>
 </template>
 <script>
-import axios from "axios";
 import alerts from "../../mixins/sweetalert";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
@@ -129,3 +107,8 @@ export default {
   },
 };
 </script>
+<style>
+.dp__input {
+  padding: 9px 0px !important; 
+}
+</style>
