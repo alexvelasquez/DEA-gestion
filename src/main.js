@@ -1,32 +1,35 @@
-import { createApp } from 'vue'
-import App from './App.vue'
+import { createApp } from "vue";
+import App from "./App.vue";
 
-import { router } from './router'
-import { vuetify } from './plugins/vuetify'
-import { createPinia } from 'pinia'
+import { router } from "./router";
+import { vuetify } from "./plugins/vuetify";
+import { createPinia } from "pinia";
 
-import Axios from './plugins/axios'
+import Axios from "./plugins/axios";
 
-import VueSweetalert2 from 'vue-sweetalert2';
-import 'sweetalert2/dist/sweetalert2.min.css';
+import VueSweetalert2 from "vue-sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 
-import './assets/custom.css'
-import 'animate.css';
+import VueDatePicker from "@vuepic/vue-datepicker";
+import "@vuepic/vue-datepicker/dist/main.css";
 
-import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
-const pinia = createPinia()
-pinia.use(piniaPluginPersistedstate)
+import "./assets/custom.css";
 
-import GlobalMixin from './mixins/global'
+import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
+const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
 
-import moment from  'moment'
+import GlobalMixin from "./mixins/global";
+
+import moment from "moment";
 
 const app = createApp(App)
-    .use(router)
-    .use(vuetify)
-    .use(pinia)
-    .use(VueSweetalert2)
-    .mixin(GlobalMixin)
-app.config.globalProperties.$http = Axios
-app.config.globalProperties.$moment = moment
-app.mount('#app')
+  .use(router)
+  .use(vuetify)
+  .use(pinia)
+  .use(VueSweetalert2)
+  .use(VueDatePicker)
+  .mixin(GlobalMixin);
+app.config.globalProperties.$http = Axios;
+app.config.globalProperties.$moment = moment;
+app.mount("#app");

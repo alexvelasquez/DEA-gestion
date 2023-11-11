@@ -1,67 +1,142 @@
 <template>
-  <v-row>
-    <v-col>
-      image
-    </v-col>
-    <v-col>
-      <v-card>
-        <v-card-title>Iniciar sesión</v-card-title>
-        <v-card-text>
-          <v-form @submit.prevent="login">
-            <v-text-field v-model="email" label="Email"></v-text-field>
-            <v-text-field v-model="password" label="Contraseña" type="password" variant="outlined"></v-text-field>
-            <v-btn color="primary" type="submit">Ingresar</v-btn>
-          </v-form>
-          <div class="text-grey">{{ loginError }}</div>
+  <v-row
+    class="d-flex bg-gradient justify-center align-center"
+    style="width: 100%; height: 100vh"
+  >
+    <v-form
+      ref="form"
+      class="animate__animated animate__bounceInDown"
+    >
+      <v-card class="mx-auto pa-12 pb-8" elevation="8" width="500" rounded="lg">
+        <div class="text-subtitle-1 text-medium-emphasis">
+          Correo Electrónico
+        </div>
+        <v-text-field
+          v-model="auth.email"
+          :rules="ruleEmail"
+          density="compact"
+          placeholder="Correo electrónico"
+          prepend-inner-icon="mdi-email-outline"
+          variant="outlined"
+          required
+        ></v-text-field>
+
+        <div
+          class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between"
+        >
+          Contraseña
+        </div>
+
+        <v-text-field
+          v-model="auth.password"
+          :rules="rulePass"
+          :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+          :type="visible ? 'text' : 'password'"
+          density="compact"
+          placeholder="Ingresá tu contraseña"
+          prepend-inner-icon="mdi-lock-outline"
+          variant="outlined"
+          @click:append-inner="visible = !visible"
+          required
+        ></v-text-field>
+
+        <v-card v-if="loginError" color="error" variant="tonal">
+          <v-card-text class="text-medium-emphasis text-caption">
+            {{ loginError }}
+          </v-card-text>
+        </v-card>
+
+        <v-btn
+          block
+          class="mt-8"
+          color="primary"
+          type="button"
+          @click="login"
+          size="large"
+          variant="tonal"
+        >
+          Ingresar
+        </v-btn>
+
+        <v-card-text class="text-center">
+          ¿Aún no tenés una cuenta? <br />
+          <a
+            class="text-blue text-decoration-none"
+            href="#"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Registrar aqui
+          </a>
         </v-card-text>
-        <v-card-actions>
-          <v-btn color="red" @click="loginWithGoogle">Ingresar con Google</v-btn>
-        </v-card-actions>
       </v-card>
-    </v-col>
+    </v-form>
   </v-row>
 </template>
 
 <script>
+import "animate.css";
 export default {
   data() {
     return {
-      email: '',
-      password: '',
-      users: [
-        { email: 'adminprovincial@example.com', password: '12345', role: 'adminProvincial' },
-        { email: 'representante@example.com', password: '12345', role: 'representante' },
-        { email: 'certificante@example.com', password: '12345', role: 'certificante' }
+      ruleEmail: [
+        (value) => {
+          if (value) return true;
+
+          return "El correo electrónico es requerido.";
+        },
       ],
-      currentUser: null,
-      loginError: null
+      rulePass: [
+        (value) => {
+          if (value) return true;
+
+          return "La contraseña es requerida.";
+        },
+      ],
+      auth: {
+        email: null,
+        password: null,
+      },
+      redirects: {
+        administrador_provincial: "/administrador-provincial",
+        representante: "/representante",
+        certificador: "/usuario-certificante",
+      },
+      loginError: null,
+      visible: false,
     };
   },
   methods: {
-    login() {
-      // Verificar las credenciales del usuario
-      // console.log()
-      const user = this.users.find(user => user.email === this.email && user.password === this.password);
-      // this.$router.push({name: "home"});
-      if (user) {
-        // Usuario autenticado correctamente
-        this.currentUser = user;
+    async login() {
+      try {
+        const { valid } = await this.$refs.form.validate();
+        if (valid) {
+          this.loadingApp = true;
+          const {
+            data: { access_token },
+          } = await this.$http.post("/login/", this.auth);
+          localStorage.setItem("token", access_token);
 
-        // Redirigir según el rol del usuario
-        if (user.role === 'adminProvincial') {
-          this.$router.push('/provincial-administrator');
-        } else if (user.role === 'representante') {
-          this.$router.push('/representative');
-        } else {
-          this.$router.push('/certify-user');
+          const { data: user } = await this.$http.get("/users/me/");
+          this.user = user;
+          this.$router.push(this.redirects[user.rol]);
         }
-      } else {
-        // Credenciales incorrectas
-        this.loginError = 'Credenciales incorrectas. Por favor, inténtalo nuevamente.';
+      } catch (error) {
+        this.loginError = "Datos ingresados incorrectos";
+      } finally {
+        this.loadingApp = false;
       }
     },
-    loginWithGoogle() {
-    }
-  }
+  },
 };
 </script>
+<style>
+.bg-gradient {
+  background: rgb(77, 139, 160);
+  background: linear-gradient(
+    209deg,
+    rgba(77, 139, 160, 1) 24%,
+    rgba(176, 214, 226, 1) 100%
+  );
+}
+</style>

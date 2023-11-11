@@ -21,39 +21,31 @@
   </div>
 </template>
 <script>
+import "animate.css";
 export default {
   data() {
     return {
       title: "INGRESANDO AL ESPACIO",
     };
   },
-  async beforeMount() {
-    if (this.$route.query.rol) {
-      localStorage.removeItem("espacio-obligado");
-      this.title = "VOLVIENDO AL MENÚ";
-    }
-  },
-  async mounted() {
-    if (this.$route.query.rol) {
-      const response = await new Promise((resolve) =>
-        setTimeout(resolve, 2000)
-      );
-      this.rol = "REPRESENTANTE";
-      this.$router.push("/representante");
-    } else {
-      const response = await new Promise((resolve) =>
-        setTimeout(resolve, 1500)
-      );
-      var {
-        data: { data: espacio_obligado },
-      } = await this.$http(`/espacios_obligados/${this.$route.params.espacio}`);
 
-      localStorage.setItem(
-        "espacio-obligado",
-        JSON.stringify(espacio_obligado)
-      );
-      this.rol = "DEA";
-      this.$router.push({ name: "entidad-sede", params: this.$route.params });
+  async mounted() {
+    try {
+      console.log(this.$route);
+      if (this.$route.query.rol) {
+        this.title = "VOLVIENDO AL MENÚ";
+        this.espacioObligado = null;
+        this.rol = "REPRESENTANTE";
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        this.$router.push("/representante");
+      } else {
+        this.updateEspacioObligado(this.$route.params.espacio);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        this.rol = "DEA";
+        this.$router.push({ name: "entidad-sede", params: this.$route.params });
+      }
+    } catch (error) {
+      console.log(error);
     }
   },
 };

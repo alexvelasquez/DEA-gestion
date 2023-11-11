@@ -61,7 +61,6 @@
                 density="compact"
                 item-title="nombre"
                 item-value="id"
-                value="publico"
                 :items="[
                   {
                     nombre: 'Público',
@@ -72,6 +71,7 @@
                     id: 'privado',
                   },
                 ]"
+                persistent-placeholder
               >
               </v-select>
             </v-col>
@@ -81,8 +81,8 @@
                 label="Tipo"
                 variant="outlined"
                 density="compact"
-                placeholder="tipo"
-                persistent-placeholder=""
+                placeholder=""
+                persistent-placeholder
               >
               </v-text-field>
             </v-col>
@@ -91,7 +91,7 @@
                 readonly
                 v-model="sede.direccion"
                 label="Dirección"
-                placeholder="Calle 46 n° 596 "
+                placeholder=""
                 variant="outlined"
                 density="compact"
                 persistent-placeholder
@@ -123,11 +123,12 @@
             <v-col cols="12" md="3" class="mt-md-n5">
               <v-text-field
                 v-model="sede.superficie"
-                label="Superficie (*)"
+                label="Superficie (*) m2"
                 placeholder="54 mt2"
                 variant="outlined"
                 density="compact"
                 persistent-placeholder
+                :rules="numberRule"
               >
               </v-text-field>
             </v-col>
@@ -139,6 +140,7 @@
                 variant="outlined"
                 density="compact"
                 persistent-placeholder
+                :rules="numberRule"
               >
               </v-text-field>
             </v-col>
@@ -150,6 +152,7 @@
                 variant="outlined"
                 density="compact"
                 persistent-placeholder
+                :rules="numberRule"
               >
               </v-text-field>
             </v-col>
@@ -161,6 +164,7 @@
                 variant="outlined"
                 density="compact"
                 persistent-placeholder
+                :rules="numberRule"
               >
               </v-text-field>
             </v-col>
@@ -220,6 +224,7 @@
                 variant="outlined"
                 density="compact"
                 persistent-placeholder
+                :rules="emailRule"
               >
               </v-text-field>
             </v-col>
@@ -263,23 +268,58 @@
   </v-row>
 </template>
 <script>
+import { useEspacioStore } from "../../../stores/espacio";
+import { mapState } from "pinia";
 import alerts from "../../../mixins/sweetalert";
 export default {
   mixins: [alerts],
   data() {
     return {
       responsables: [],
-
       provincias: [],
       sede: {
         entidad: {},
+        sector: "publico",
       },
     };
   },
+  computed: {
+    ...mapState(useEspacioStore, ["menuValidacionDEA"]),
+    stringRule() {
+      return [
+        (value) => {
+          if (!/^[A-Za-z\s]$/.test(value)) {
+            return "Ingrese solo letras";
+          }
+          return true;
+        },
+      ];
+    },
+    emailRule() {
+      return [
+        (value) => {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(value)) {
+            return "Ingrese una dirección de correo electrónico válida";
+          }
+          return true;
+        },
+      ];
+    },
+    numberRule() {
+      return [
+        (value) => {
+          if (!/^\d+$/.test(value)) {
+            return "Ingrese solo números";
+          }
+          return true;
+        },
+      ];
+    },
+  },
   async created() {
     try {
-      const { sede } = this.espacioObligado;
-      this.sede = { ...sede };
+      await this.fetchSedes();
 
       const {
         data: { data: provincias },
@@ -288,7 +328,7 @@ export default {
 
       const {
         data: { data: responsables },
-      } = await this.$http(`/responsables/${sede.id}/`);
+      } = await this.$http(`/responsables/${this.sede.id}/`);
       this.responsables = responsables;
     } catch (error) {
       console.log(error);
@@ -329,10 +369,23 @@ export default {
             cantidad_personas_externas: cantidad_personas_externas,
             cantidad_personas_estables: cantidad_personas_estables,
           });
-          this.alertSuccess("Modificado correctamente", "");
-
-          this.responsables[indiceResponsable] = responsable;
+          const { isConfirmed } = await this.alertSuccess(
+            "SEDE",
+            "Cambios realizados."
+          );
+          // Actualizo el espacio obligado, para evaluar si cumplo con las condiciones para cargar un DEA
+          await this.updateEspacioObligado(this.$route.params.espacio);
         }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async fetchSedes() {
+      try {
+        const {
+          data: { data: sede },
+        } = await this.$http.get(`/sedes/${this.$route.params.espacio}/`);
+        this.sede = { ...sede };
       } catch (error) {
         console.log(error);
       }
@@ -350,7 +403,7 @@ export default {
             `/responsables/${this.sede.id}/`,
             this.responsables[indiceResponsable]
           );
-          this.alertSuccess("Creado correctamente", "");
+          this.alertSuccess("Responsable", "Creado con exito");
 
           this.responsables[indiceResponsable] = responsable;
         }
@@ -359,9 +412,14 @@ export default {
       }
     },
   },
-  computed: {
+  watch: {
     espacioObligado() {
-      return JSON.parse(localStorage.getItem("espacio-obligado"));
+      if (
+        this.espacioObligado?.puede_cargar_dea &&
+        !this.keysMenuUser.includes("DEAS")
+      ) {
+        this.menuUser = this.menuUser.concat(this.menuValidacionDEA);
+      }
     },
   },
 };

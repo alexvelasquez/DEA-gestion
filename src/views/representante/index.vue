@@ -11,18 +11,23 @@ export default {
         {
           name: "MIS ESPACIOS",
           icon: "mdi-store",
-          to: "/representante/espacios-obligados",
+          to: {
+            name:"espacios-obligados"
+          },
         },
         {
           name: "SOLICITAR REPRESENTACIÓN",
           icon: "mdi-badge-account",
-          to: "/representante/solicitar-representacion",
+          to: {
+            name:"solicitar-representacion"
+          },
         },
       ],
     };
   },
-  beforeMount() {
+  async created() {
     this.menuUser = this.menu;
+    await this.fetchNotifications()
   },
 };
 </script>

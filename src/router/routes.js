@@ -1,5 +1,5 @@
-import Home from "../views/Home.vue";
-import Redireccion from '../views/Redireccion.vue'
+import Redireccion from "../views/Redireccion.vue";
+import ConfirmarSolicitud from "../views/ConfirmarSolicitud.vue";
 
 /** AUTH */
 import Auth from "../views/auth/index.vue";
@@ -10,7 +10,7 @@ import MisEspaciosObligados from "../views/representante/usuario/MisEspaciosObli
 import SolicitarRepresentacion from "../views/representante/usuario/SolicitarRepresentacion.vue";
 
 /** REPRESENTANTE DEA */
-import EspacioObligado from "../views/representante/espacio-obligado/index.vue"
+import EspacioObligado from "../views/representante/espacio-obligado/index.vue";
 import Deas from "../views/representante/espacio-obligado/Deas.vue";
 import EntidadSede from "../views/representante/espacio-obligado/EntidadSede.vue";
 import DeclaracionJurada from "../views/representante/espacio-obligado/DeclaracionJurada.vue";
@@ -25,43 +25,42 @@ import UsuarioCertificante from "../views/usuario-certificante/index.vue";
 import HomeUsuarioCertificante from "../views/usuario-certificante/Home.vue";
 
 const routes = [
-  {
-    path: "/",
-    name: "home",
-    component: Home,
-    meta: {
-      auth: false,
-      title: 'Home'
-    },
-  },
-  {
-    path: "/redirect/:espacio",
-    name: "redirect",
-    component: Redireccion,
-    meta: {
-      auth: false,
-      title: ''
-    },
-  },
-
-
   /** AUTH */
   {
-    path: "/auth",
+    path: "",
     name: "auth",
     component: Auth,
     meta: {
       auth: false,
+      title: "Home",
     },
   },
-
+  {
+    path: "/confirmar-solicitud/:solicitud?",
+    name: "confirmar-solicitud",
+    component: ConfirmarSolicitud,
+    meta: {
+      auth: false,
+      title: "Confirmar Solicitud",
+    },
+  },
+  {
+    path: "/redirect/:espacio?",
+    name: "redirect",
+    component: Redireccion,
+    meta: {
+      auth: false,
+      title: "",
+      rol: "representante",
+    },
+  },
 
   /** REPRESENTATIVE */
   {
     path: "/representante",
     name: "representante",
     component: Representante,
-    redirect: { name: 'espacios-obligados' },
+    redirect: { name: "espacios-obligados" },
     children: [
       {
         path: "espacios-obligados",
@@ -69,7 +68,8 @@ const routes = [
         component: MisEspaciosObligados,
         meta: {
           auth: true,
-          title: 'Mis espacios'
+          title: "Mis espacios",
+          rol: "representante",
         },
       },
       {
@@ -78,14 +78,15 @@ const routes = [
         component: SolicitarRepresentacion,
         meta: {
           auth: true,
-          title: 'Solicitar representación'
+          title: "Solicitar representación",
+          rol: "representante",
         },
       },
       {
-        path: "espacio-obligado/:espacio",
+        path: "espacio-obligado/:espacio?",
         name: "representante",
         component: EspacioObligado,
-        redirect: { name: 'entidad-sede' },
+        redirect: { name: "entidad-sede" },
         children: [
           {
             path: "entidad-sede",
@@ -93,7 +94,8 @@ const routes = [
             component: EntidadSede,
             meta: {
               auth: true,
-              title: 'Entidad/Sede'
+              title: "Entidad/Sede",
+              rol: "representante",
             },
           },
           {
@@ -102,7 +104,8 @@ const routes = [
             component: Deas,
             meta: {
               auth: true,
-              title: 'DEAS'
+              title: "DEAS",
+              rol: "representante",
             },
           },
           {
@@ -111,7 +114,8 @@ const routes = [
             component: DeclaracionJurada,
             meta: {
               auth: true,
-              title: 'Declaración Jurada'
+              title: "Declaración Jurada",
+              rol: "representante",
             },
           },
           {
@@ -120,23 +124,21 @@ const routes = [
             component: MuertesSubita,
             meta: {
               auth: true,
-              title: 'Muertes súbitas'
+              title: "Muertes súbitas",
+              rol: "representante",
             },
           },
-        ]
-      }
-
-    ]
+        ],
+      },
+    ],
   },
-
-
 
   /** CERTIFICANTE */
   {
     path: "/usuario-certificante",
     name: "usuario-certificante",
     component: UsuarioCertificante,
-    redirect: { name: 'home-usuario-certificante' },
+    redirect: { name: "home-usuario-certificante" },
     children: [
       {
         path: "",
@@ -144,27 +146,33 @@ const routes = [
         component: HomeUsuarioCertificante,
         meta: {
           auth: true,
+          rol: "usuario-certificante",
         },
       },
-    ]
+    ],
   },
   /** PROVINCIAL */
   {
     path: "/administrador-provincial",
     name: "administrador-provincial",
     component: AdministradorProvincial,
-    redirect: { name: 'home-administrador' },
+    redirect: { name: "home-administrador" },
     children: [
       {
-        path: "",
+        path: "/",
         name: "home-administrador",
         component: HomeAdministrador,
         meta: {
           auth: true,
-          title: 'Solicitudes'
+          title: "Solicitudes",
+          rol: "administrador-provincial",
         },
       },
-    ]
+    ],
+  },
+  {
+    path: "/:catchAll(.*)",
+    redirect: { name: "auth" },
   },
 ];
 

@@ -1,6 +1,6 @@
 <template>
   <v-row class="px-4">
-    <v-col cols="4" v-for="(space, i) in espacios" :key="i">
+    <v-col cols="12" md="4" v-for="(space, i) in espacios" :key="i">
       <v-card class="rounded-t-lg">
         <v-img
           width="100%"
@@ -35,7 +35,7 @@
 
         <v-card-actions>
           <v-btn
-            :to="{ path: `/redirect/${space.id}` }"
+            :to="{ name: `redirect`, params: { espacio: space.id } }"
             color="primary"
             block
             prepend-icon="mdi-store-outline"
@@ -58,7 +58,7 @@ export default {
           color: "warning",
           nombre: "EN PROCESO DE SER CADIO-ASISTIDO",
         },
-        DDJJ: {
+        "Cardio-Asistido con DDJJ": {
           icon: "mdi-draw",
           color: "primary",
           nombre: "CARDIO-ASISTIDO CON DDJJ",
