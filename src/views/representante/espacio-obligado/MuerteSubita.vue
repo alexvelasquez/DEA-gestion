@@ -35,12 +35,8 @@
                 item-props
                 lines="three"
                 style="border-left: 5px solid #c2c9d6"
-                class="py-"
               >
                 <v-list-item v-for="(persona, i) in dataMuertes" :key="i">
-                  <template v-slot:prepend>
-                    <v-avatar color="primary"> </v-avatar>
-                  </template>
                   <template v-slot:title>
                     {{ persona.sexo }}
                   </template>

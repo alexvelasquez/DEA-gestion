@@ -12,7 +12,7 @@
       <v-row>
         <v-col cols="12">
           <v-row>
-            <v-col cols="6">
+            <v-col cols="12">
               <span class="text-caption">FECHA DE INICIO - FECHA DE FIN</span>
               <VueDatePicker
                 v-model="date"
@@ -23,7 +23,7 @@
                 teleport-center
               ></VueDatePicker>
             </v-col>
-            <v-col cols="12" md="6">
+            <v-col cols="12">
               <span class="text-caption">TÉCNICO</span>
               <v-text-field
                 v-model="tecnico"
@@ -73,7 +73,7 @@ export default {
     async guardarReparacion(dea) {
       try {
         const { isConfirmed } = await this.alertQuestion(
-          "Guardar Reparacion",
+          "Guardar Reparación",
           "¿Confirmar?"
         );
         if (isConfirmed) {
@@ -84,24 +84,16 @@ export default {
             "YYYY-MM-DDTHH:mm:ss.SSS[Z]"
           );
 
-          this.loadingApp = true;
           const params = {
             fecha_inicio: fechaInicio,
             fecha_fin: fechaFin,
             tecnico: this.tecnico,
           };
-          const { data } = await this.$http.post(
-            `/reparacion/dea/${this.dea.id}/`,
-            params
-          );
-
-          this.alertSuccess("Reparacion Guardada correctamente", "");
           this.$emit("close");
-          this.$emit("save");
+          this.$emit("save", params);
         }
       } catch (error) {
-      } finally {
-        this.loadingApp = false;
+        console.log(error);
       }
     },
   },
@@ -109,6 +101,7 @@ export default {
 </script>
 <style>
 .dp__input {
-  padding: 9px 0px !important; 
+  padding-top: 9px!important;
+  padding-bottom: 9px!important;
 }
 </style>

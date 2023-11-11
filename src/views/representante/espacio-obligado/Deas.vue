@@ -1,5 +1,5 @@
 <template>
-  <v-row v-if="!loadingApp" class="mt-2" style="min-height: 70vh">
+  <v-row class="mt-2" style="min-height: 70vh">
     <v-col cols="12" v-if="deas.length">
       <v-row class="mb-4">
         <v-col cols="12" md="10"> </v-col>
@@ -144,11 +144,14 @@
                         :key="i"
                       >
                         <p>
-                          Fecha Reparacion:
+                          - Reparado el día
                           {{
                             $moment(reparacion.fecha_fin).format("DD/MM/YYYY")
                           }}
-                          Por: {{ reparacion.tecnico }}
+                          a las
+                          {{ $moment(reparacion.fecha_fin).format("HH:mm") }}
+                          por
+                          <strong>{{ reparacion.tecnico }}</strong>
                         </p>
                       </div>
                     </div>
@@ -193,9 +196,9 @@
               persistent
             >
               <ModalReparacion
-                @close="dialogReparacion = false"
                 :dea="dea"
-                @save="habilitar(dea)"
+                @close="dialogReparacion = false"
+                @save="habilitar(dea, $event)"
               />
             </v-dialog>
           </v-expansion-panel-text>
@@ -203,7 +206,7 @@
       </v-expansion-panels>
     </v-col>
     <div
-      v-else-if="deas.length === 0"
+      v-if="!loadingApp && deas.length === 0"
       class="d-flex flex-column justify-center align-center"
     >
       <v-icon
@@ -282,23 +285,14 @@ export default {
     }
   },
   methods: {
-    getMarca(value) {
-      try {
-        const marca = this.marcas.find((m) => m.id == value);
-        return marca;
-      } catch (error) {
-        return null;
-      }
-    },
     async fetchDeas() {
       try {
+        this.dialogReparacion = false;
         this.dialog = false;
         const {
           data: { data: deas },
         } = await this.$http(`/deas/${this.$route.params.espacio}/`);
-        this.deas = deas.map((d) => {
-          return { ...d, ...{ marca: this.getMarca(d.marca) } };
-        });
+        this.deas = deas;
       } catch (error) {}
     },
     async getReparaciones(dea) {
@@ -337,11 +331,8 @@ export default {
           await this.$http.delete(
             `/deas/${this.$route.params.espacio}/${dea}/`
           );
-          const {
-            data: { data: deas },
-          } = await this.$http(`/deas/${this.$route.params.espacio}/`);
-          this.deas = deas;
-          this.updateEspacioObligado(this.$route.params.espacio);
+          await this.updateEspacioObligado(this.$route.params.espacio);
+          await this.fetchDeas();
           this.alertSuccess("DEA eliminado correctamente", "");
           this.loadingApp = false;
         }
@@ -356,18 +347,36 @@ export default {
           "¿Confirmar?"
         );
         if (isConfirmed) {
+          this.loadingApp = true;
           const params = {
             activo: false,
           };
           await this.$http.post(`/activacion/dea/${dea.id}/?activo=false`);
           // get deas
-          const {
-            data: { data: deas },
-          } = await this.$http(`/deas/${this.$route.params.espacio}/`);
-          this.deas = deas;
+          await this.fetchDeas();
+          this.loadingApp = false;
           this.alertSuccess("Puesto en reparacion", "");
         }
       } catch (error) {}
+    },
+
+    async habilitar(dea, params) {
+      try {
+        this.loadingApp = true;
+        const { data: reparacion } = await this.$http.post(
+          `/reparacion/dea/${dea.id}/`,
+          params
+        );
+        const { data: activacion } = await this.$http.post(
+          `/activacion/dea/${dea.id}/?activo=true`
+        );
+        this.loadingApp = false;
+        this.alertSuccess("Habilitada correctamente", "");
+        await this.fetchDeas();
+      } catch (error) {
+        console.log(error);
+      } finally {
+      }
     },
 
     async mantenimientoDea(dea) {
@@ -389,25 +398,6 @@ export default {
           this.alertSuccess("Mantenimiento correcto", "");
         }
       } catch (error) {}
-    },
-
-    async habilitar(dea) {
-      try {
-        //logica habilitar
-        this.loadingApp = true;
-        const { data } = await this.$http.post(
-          `/activacion/dea/${dea.id}/?activo=true`
-        );
-        // get deas
-        const {
-          data: { data: deas },
-        } = await this.$http(`/deas/${this.$route.params.espacio}/`);
-        this.deas = deas;
-        this.loadingApp = false;
-      } catch (error) {
-      } finally {
-        this.loadingApp = false;
-      }
     },
   },
   watch: {},
