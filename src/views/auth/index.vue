@@ -62,12 +62,13 @@
           ¿Aún no tenés una cuenta? <br />
           <a
             class="text-blue text-decoration-none"
-            href="#"
+            @click="register"
             rel="noopener noreferrer"
             target="_blank"
           >
             Registrar aqui
           </a>
+
         </v-card-text>
       </v-card>
     </v-form>
@@ -76,6 +77,7 @@
 
 <script>
 import "animate.css";
+
 export default {
   data() {
     return {
@@ -126,6 +128,11 @@ export default {
       } finally {
         this.loadingApp = false;
       }
+    },
+    async register() {
+      this.$router.push({
+        name: "register",
+      });
     },
   },
 };

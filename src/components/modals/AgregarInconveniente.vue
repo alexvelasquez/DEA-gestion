@@ -119,9 +119,11 @@ export default {
         if (isConfirmed) {
           const { data } = await this.$http.post(`/inconvenientes/${this.$route.params.espacio}/${this.muerteSubita.id}/`, this.inconveniente);
           this.alertSuccess("Cargado correctamente", "");
-          this.emmit("close")
+          this.$emit("save");
+          this.$emit("close");
         }
       } catch (error) {
+        console.log(error)
         this.alertError("No se pudo cargar", "");
       } finally {
         this.loadingApp = false;

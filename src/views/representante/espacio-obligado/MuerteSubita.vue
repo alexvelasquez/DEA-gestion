@@ -77,12 +77,12 @@
                       </p>
                       <p>
                         equipo estaba en sitio:
-                        {{ persona.incovenientes[0].estaba_en_sitio }}
+                        {{ persona.incovenientes[0].estaba_en_sitio ? "Si" : "No"}}
                       </p>
                       <p>
                         Falto insumos:
                         {{
-                          persona.incovenientes[0].falta_insumos ? "si" : "no"
+                          persona.incovenientes[0].falta_insumos ? "Si" : "No"
                         }}
                       </p>
                     </div>
@@ -113,8 +113,8 @@
     <v-dialog v-model="dialogInconveniente" width="650" z-index="1" persistent>
       <ModalInconveniente
         @close="dialogInconveniente = false"
-        :muerteSubita="personaIdLocal"
         @save="fetchMuertesSubitas()"
+        :muerteSubita="personaIdLocal"
       />
     </v-dialog>
     <v-dialog v-model="dialog" width="650" z-index="1" persistent>
@@ -144,10 +144,6 @@ export default {
   async created() {
     try {
       this.loadingApp = true;
-      // const {
-      //   data: { data: solicitudes },
-      // } = await this.fetchMuertesSubitas();
-      // this.dataMuertes = solicitudes;
       await this.fetchMuertesSubitas();
     } catch (error) {
     } finally {
@@ -159,7 +155,7 @@ export default {
       const {
         data: { data: muertesSubitas },
       } = await this.$http(`/muerte-subita/${this.$route.params.espacio}/`);
-      this.dataMuertes = muertesSubitas;
+      this.dataMuertes = muertesSubitas.sort((a, b) => b.id - a.id);;
     },
   },
 };

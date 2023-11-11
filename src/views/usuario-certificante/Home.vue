@@ -31,7 +31,7 @@
                     >REGISTRAR VISITA</v-btn
                   >
                   <v-btn
-                    @click="fetchVisitasEspacio(espacio.id)"
+                    @click="fetchVisitasEspacio(espacio.id), espacioSelected = espacio"
                     class="mr-2"
                     color="primary"
                     variant="tonal"
@@ -41,10 +41,10 @@
             </v-list-item>
             <v-divider></v-divider>
             <v-dialog v-model="dialog" width="650" z-index="1" persistent>
-              <ModalRegistrarVisita @close="dialog = false" :espacio="espacio.id" @save="fetchEspacios()" />
+              <ModalRegistrarVisita @close="dialog = false" :espacioId="espacioSelected" @save="fetchEspacios()" />
             </v-dialog>
             <v-dialog v-model="dialogToListadoVisitas" width="650" z-index="1" persistent>
-              <ModalListadoVisita @close="dialogToListadoVisitas = false" :visitas="visitas" :espacio="espacio"/>
+              <ModalListadoVisita @close="dialogToListadoVisitas = false" :visitas="visitas" :espacioName="espacioSelected"/>
             </v-dialog>
         </div>
       </v-list>
@@ -75,6 +75,7 @@ export default {
   data() {
     return {
       dialog: false,
+      espacioSelected: null,
       dialogToListadoVisitas: false,
       espacios: [],
       espacioSeleccionada: null,

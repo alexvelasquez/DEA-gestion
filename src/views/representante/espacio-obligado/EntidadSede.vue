@@ -233,7 +233,7 @@
                 v-model="responsable.telefono"
                 :readonly="responsable.id"
                 label="Teléfono"
-                placeholder="221-6767418"
+                placeholder="2216767418"
                 variant="outlined"
                 density="compact"
                 persistent-placeholder

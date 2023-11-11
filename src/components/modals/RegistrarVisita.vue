@@ -82,6 +82,7 @@
       </v-row>
     </v-card-text>
     <v-divider></v-divider>
+    {{ espacioId }}
     <v-card-actions class="justify-center">
       <v-btn color="primary" variant="tonal" @click="$emit('close')"
         >CERRAR</v-btn
@@ -102,7 +103,7 @@ import moment from "moment";
 export default {
   components: { VueDatePicker },
   mixins: [alerts],
-  props: ["espacio"],
+  props: ["espacioId"],
   data() {
     return {
       picker: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
@@ -115,7 +116,7 @@ export default {
         fecha: null,
         observaciones: null,
         resultado: null,
-        espacio_obligado: this.espacio,
+        espacio_obligado: this.espacioId.id,
       },
     };
   },

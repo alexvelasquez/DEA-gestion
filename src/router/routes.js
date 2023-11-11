@@ -3,6 +3,7 @@ import ConfirmarSolicitud from "../views/ConfirmarSolicitud.vue";
 
 /** AUTH */
 import Auth from "../views/auth/index.vue";
+import Register from "../views/auth/Register.vue";
 
 /** REPRESENTANTE */
 import Representante from "../views/representante/index.vue";
@@ -30,6 +31,15 @@ const routes = [
     path: "",
     name: "auth",
     component: Auth,
+    meta: {
+      auth: false,
+      title: "Home",
+    },
+  },
+  {
+    path: "/register",
+    name: "register",
+    component: Register,
     meta: {
       auth: false,
       title: "Home",

@@ -6,7 +6,7 @@
         border="start"
         border-color="fourth"
       >
-        <strong> LISTADO VISITAS EN {{ espacio.nombre }} </strong>
+        <strong> LISTADO VISITAS EN {{ espacioName.nombre }} </strong>
       </v-alert>
       <div v-for="(visita, i) in visitas" :key="i">
             <v-divider v-if="i == 0"></v-divider>
@@ -43,7 +43,7 @@
   <script>
 
   export default {
-    props: ["visitas", "espacio"],
+    props: ["visitas", "espacioName"],
     data() {
       return {
         colorEstado:{

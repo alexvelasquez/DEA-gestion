@@ -144,7 +144,7 @@ export default {
             `/muerte-subita/${this.$route.params.espacio}/`,
             muerte
           );
-          this.alertSuccess("Guarda", "");
+          this.alertSuccess("Muerte subita guardada", "");
           this.$emit("save");
           this.$emit("close");
         }
