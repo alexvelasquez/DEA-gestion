@@ -36,7 +36,7 @@ const routes = [
     },
   },
   {
-    path: "/confirmar-solicitud/:solicitud",
+    path: "/confirmar-solicitud/:solicitud?",
     name: "confirmar-solicitud",
     component: ConfirmarSolicitud,
     meta: {
@@ -45,7 +45,7 @@ const routes = [
     },
   },
   {
-    path: "/redirect/:espacio",
+    path: "/redirect/:espacio?",
     name: "redirect",
     component: Redireccion,
     meta: {
@@ -83,7 +83,7 @@ const routes = [
         },
       },
       {
-        path: "espacio-obligado/:espacio",
+        path: "espacio-obligado/:espacio?",
         name: "representante",
         component: EspacioObligado,
         redirect: { name: "entidad-sede" },

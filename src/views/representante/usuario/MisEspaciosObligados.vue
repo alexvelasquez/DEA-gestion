@@ -35,7 +35,7 @@
 
         <v-card-actions>
           <v-btn
-            :to="{ path: `/redirect/${space.id}` }"
+            :to="{ name: `redirect`, params: { espacio: space.id } }"
             color="primary"
             block
             prepend-icon="mdi-store-outline"

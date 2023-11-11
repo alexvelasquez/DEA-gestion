@@ -16,6 +16,6 @@ export default {
   },
   methods: {
     ...mapActions(useEspacioStore, ["updateEspacioObligado"]),
-    ...mapActions(useAppStore, ["fetchNotifications"]),
+    ...mapActions(useAppStore, ["fetchNotifications","logOut"]),
   },
 };

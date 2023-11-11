@@ -94,7 +94,7 @@
         </v-row>
       </v-col>
     </v-row>
-    <div v-else class="d-flex flex-column justify-center align-center">
+    <div v-else class="d-flex flex-column justify-center align-center" style="width:100%">
       <v-icon
         color="grey-lighten-2"
         icon="mdi-text-box-search-outline"

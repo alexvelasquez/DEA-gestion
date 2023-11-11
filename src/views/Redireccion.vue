@@ -28,8 +28,10 @@ export default {
       title: "INGRESANDO AL ESPACIO",
     };
   },
+
   async mounted() {
     try {
+      console.log(this.$route);
       if (this.$route.query.rol) {
         this.title = "VOLVIENDO AL MENÚ";
         this.espacioObligado = null;
@@ -37,13 +39,8 @@ export default {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         this.$router.push("/representante");
       } else {
-        const {
-          data: { data: espacio_obligado },
-        } = await this.$http(
-          `/espacios_obligados/${this.$route.params.espacio}/`
-        );
+        this.updateEspacioObligado(this.$route.params.espacio);
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        this.espacioObligado = espacio_obligado
         this.rol = "DEA";
         this.$router.push({ name: "entidad-sede", params: this.$route.params });
       }

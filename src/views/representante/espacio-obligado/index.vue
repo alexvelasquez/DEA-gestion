@@ -41,6 +41,7 @@ export default {
         icon: "mdi-heart-pulse",
         to: {
           name: "deas",
+          params: this.$route.params,
         },
         validacion: "entidad/sede",
       },
@@ -50,6 +51,7 @@ export default {
         icon: "mdi-file-sign",
         to: {
           name: "ddjj",
+          params: this.$route.params,
         },
         validacion: "ddjj",
       },
@@ -59,6 +61,7 @@ export default {
         icon: "mdi-account-minus",
         to: {
           name: "muertes-subita",
+          params: this.$route.params,
         },
         validacion: "ddjj",
       },
@@ -74,10 +77,11 @@ export default {
     this.menuUser = this.menu.concat(misMenus);
   },
   methods: {
-    back() {
+    async back() {
       this.rol = "REPRESENTANTE";
       this.$router.push({
         name: "redirect",
+        params: this.$route.params,
         query: {
           rol: this.rol,
         },
