@@ -1,10 +1,11 @@
 import { defineStore } from "pinia";
-
+import http from "../plugins/axios"
 export const useAppStore = defineStore("app", {
   state: () => ({
     user: null,
     loadingApp: false,
     menuUser: [],
+    notificaciones: []
   }),
   getters: {
     rol() {
@@ -31,5 +32,9 @@ export const useAppStore = defineStore("app", {
       localStorage.removeItem("token");
       this.user = null;
     },
+    async fetchNotifications() {
+      const { data: { data: notificaciones } } = await http.get('/notificaciones/')
+      this.notificaciones = notificaciones
+    }
   },
 });

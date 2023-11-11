@@ -77,16 +77,41 @@
     >
       <v-container v-if="$route.meta.auth">
         <v-system-bar
-          class="py-4 mr-4"
+          class="py-6 mr-6"
           style="width: calc((100% - 256px) - 0px); left: 256px; z-index: 1"
         >
           <span class="font-weight-bold px-4">{{ $route.meta.title }}</span>
           <v-spacer></v-spacer>
-          <div>
-            <v-icon icon="mdi-bell-badge" class="mr-2"></v-icon>
-            <span class="mr-2"
-              >{{ new Date().getHours() }}:{{ new Date().getMinutes() }}</span
-            >
+          <div class="my-4 mr-2">
+            <v-menu>
+              <template v-slot:activator="{ props }">
+                <v-badge
+                  v-bind="props"
+                  :content="notificaciones.length"
+                  color="error"
+                >
+                  <v-icon>mdi-bell-outline</v-icon>
+                </v-badge>
+              </template>
+              <v-list lines="two">
+                <div v-for="(notificacion, i) in notificaciones" :key="i">
+                  <v-list-item :title="notificacion.espacio_obligado">
+                    <v-list-item-subtitle>
+                      {{ notificacion.texto }}
+                    </v-list-item-subtitle>
+                    <template v-slot:prepend>
+                      <v-avatar color="grey-lighten-1">
+                        <v-icon color="white">mdi-email-open-outline</v-icon>
+                      </v-avatar>
+                    </template>
+                  </v-list-item>
+                  <v-divider
+                    inset
+                    v-if="i != notificaciones.length - 1"
+                  ></v-divider>
+                </div>
+              </v-list>
+            </v-menu>
           </div>
         </v-system-bar>
         <router-view></router-view>

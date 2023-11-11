@@ -208,6 +208,7 @@
     <div
       v-if="!loadingApp && deas.length === 0"
       class="d-flex flex-column justify-center align-center"
+      style="width: 100%;"
     >
       <v-icon
         color="grey-lighten-2"

@@ -5,7 +5,7 @@
         <v-snackbar
           location="top end"
           color="primary"
-          style="top: 30px"
+          style="top: 45px"
           v-model="snackbar"
           :timeout="-1"
         >

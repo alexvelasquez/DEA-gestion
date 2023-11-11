@@ -21,8 +21,9 @@ export default {
       ],
     };
   },
-  beforeMount() {
+  async created() {
     this.menuUser = this.menu;
+    await this.fetchNotifications()
   },
 };
 </script>

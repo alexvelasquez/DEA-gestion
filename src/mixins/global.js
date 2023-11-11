@@ -8,6 +8,7 @@ export default {
       "loadingApp",
       "user",
       "menuUser",
+      "notificaciones",
       "keysMenuUser",
     ]),
     ...mapWritableState(useEspacioStore, ["espacioObligado"]),
@@ -15,5 +16,6 @@ export default {
   },
   methods: {
     ...mapActions(useEspacioStore, ["updateEspacioObligado"]),
+    ...mapActions(useAppStore, ["fetchNotifications"]),
   },
 };
