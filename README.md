@@ -33,6 +33,12 @@ _Instalar Dependecias_
 yarn install
 ```
 
+_Crear un env.local con el siguiente contenido_
+
+```
+VITE_API_ENDPOINT= http://localhost:8000 (asegurarse que la api local este corriendo en este puerto)
+```
+
 _Iniciar Servidor Local (puerto:3000 por defecto)_
 
 ```
