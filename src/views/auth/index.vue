@@ -47,6 +47,8 @@
         </v-card>
 
         <v-btn
+
+
           block
           class="mt-8"
           color="primary"
@@ -59,7 +61,7 @@
         </v-btn>
 
         <v-card-text class="text-center">
-          ¿Aún no tenés una cuenta? <br />
+          ¿Aún no tenés una cuenta como representante? <br />
           <a
             class="text-blue text-decoration-none"
             @click="register"

@@ -34,6 +34,17 @@
       </v-card>
     </v-col>
     <v-col cols="12">
+      <v-alert
+        type="info"
+        color="primary"
+        text="Para poder cargar DEAS es necesario completar mas informacion sobre la sede."
+        variant="tonal"
+        v-if="!this.espacioObligado.puede_completar_ddjj_dea"
+      ></v-alert
+      
+    > 
+  </v-col>
+    <v-col cols="12">
       <v-alert class="text-fourth" border="start" border-color="fourth">
         <strong> DATOS DE LA SEDE </strong>
       </v-alert>
@@ -183,6 +194,15 @@
       </v-card>
     </v-col>
 
+    <v-col cols="12">
+      <v-alert
+        type="info"
+        color="primary"
+        text="Para poder comenzar a cargar DEAS es necesario al menos un responsable."
+        variant="tonal"
+        v-if="!this.espacioObligado.puede_completar_ddjj_dea"
+      ></v-alert
+    ></v-col>
     <v-col cols="12">
       <v-alert class="text-fourth" border="start" border-color="fourth">
         <div class="d-flex align-center justify-space-between">

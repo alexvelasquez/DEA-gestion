@@ -152,17 +152,20 @@ export default {
   methods: {
     async registrarNuevoUsuario() {
       try {
-        this.loadingApp = true;
-        const params = {
-          email: this.auth.email,
-          password: this.auth.password,
-        };
-        const { data } = await this.$http.post(`/register/`, params);
-        this.alertSuccess(
-          "Usuario nuevo registrado, proceda a iniciar sesion.",
-          ""
-        );
-        this.$router.push("/");
+        const { valid } = await this.$refs.form.validate();
+        if (valid) {
+          this.loadingApp = true;
+          const params = {
+            email: this.auth.email,
+            password: this.auth.password,
+          };
+          const { data } = await this.$http.post(`/register/`, params);
+          this.alertSuccess(
+            "Usuario nuevo registrado, proceda a iniciar sesion.",
+            ""
+          );
+          this.$router.push("/");
+        }
       } catch (error) {
         console.log(error);
         this.alertError("No se pudo crear nuevo usuario.", "");

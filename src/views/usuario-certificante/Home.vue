@@ -24,14 +24,14 @@
                 </template>
                 <template v-slot:append>
                   <v-btn
-                    @click="dialog = true"
+                    @click="dialog = true, espacioSelected = espacio"
                     class="mr-2"
                     color="success"
                     variant="tonal"
                     >REGISTRAR VISITA</v-btn
                   >
                   <v-btn
-                    @click="fetchVisitasEspacio(espacio.id), espacioSelected = espacio"
+                    @click="fetchVisitasEspacio(espacio)"
                     class="mr-2"
                     color="primary"
                     variant="tonal"
@@ -104,10 +104,11 @@ export default {
     async fetchVisitasEspacio(espacio) {
       const {
         data: { data },
-      } = await this.$http(`/visitas/${espacio}/`);
+      } = await this.$http(`/visitas/${espacio.id}/`);
       this.visitas = data;
       if (data.length) {
-        this.dialogToListadoVisitas = true 
+        this.dialogToListadoVisitas = true;
+        this.espacioSelected = espacio
       }else {
         this.alertError("No tiene visitas para mostrar", "");
       }

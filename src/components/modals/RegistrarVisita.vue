@@ -82,7 +82,6 @@
       </v-row>
     </v-card-text>
     <v-divider></v-divider>
-    {{ espacioId }}
     <v-card-actions class="justify-center">
       <v-btn color="primary" variant="tonal" @click="$emit('close')"
         >CERRAR</v-btn

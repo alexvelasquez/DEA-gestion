@@ -77,7 +77,9 @@
                       </p>
                       <p>
                         equipo estaba en sitio:
-                        {{ persona.incovenientes[0].estaba_en_sitio ? "Si" : "No"}}
+                        {{
+                          persona.incovenientes[0].estaba_en_sitio ? "Si" : "No"
+                        }}
                       </p>
                       <p>
                         Falto insumos:
@@ -99,16 +101,28 @@
       class="d-flex flex-column justify-center align-center"
       style="width: 100%"
     >
+      <div v-if="this.espacioObligado.estado != 'Cardio-Asistido con DDJJ'">
+        <v-col >
+        <v-alert
+          type="info"
+          color="primary"
+          text="Para poder cargar muertes subitas, debe pasar a estado con ddjj y no tener incongruencias."
+          variant="tonal"
+        ></v-alert>
+      </v-col>
+      </div>
       <v-icon
         color="grey-lighten-2"
         icon="mdi-text-box-search-outline"
         size="200"
       ></v-icon>
-      <v-btn @click="dialog = true" variant="tonal" color="primary"
+      <v-btn
+        @click="dialog = true"
+        variant="tonal"
+        color="primary"
         :disabled="this.espacioObligado.estado != 'Cardio-Asistido con DDJJ'"
         >NUEVA MUERTE SUBITA
-        </v-btn
-      >
+      </v-btn>
     </div>
     <v-dialog v-model="dialogInconveniente" width="650" z-index="1" persistent>
       <ModalInconveniente
@@ -155,7 +169,7 @@ export default {
       const {
         data: { data: muertesSubitas },
       } = await this.$http(`/muerte-subita/${this.$route.params.espacio}/`);
-      this.dataMuertes = muertesSubitas.sort((a, b) => b.id - a.id);;
+      this.dataMuertes = muertesSubitas.sort((a, b) => b.id - a.id);
     },
   },
 };
